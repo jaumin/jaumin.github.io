@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APAC: Balance of Power — 規則書 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;
+  --border:rgba(255,255,255,0.08);
+  --text:#c8cad4;--dim:#6b7080;
+  --blue:#3a7bd5;--blue-g:rgba(58,123,213,0.15);
+  --red:#c94040; --red-g:rgba(201,64,64,0.15);
+  --gold:#c9a84c;--gold-g:rgba(201,168,76,0.15);
+  --green:#5bab7c;--purple:#9b73cc;
+  --accent:#e8e0cc;
+  --mono:'Space Mono',monospace;--serif:'Noto Serif TC',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--serif);font-size:15px;line-height:1.75;max-width:920px;margin:0 auto;padding:0 24px 80px}
+.cover{text-align:center;padding:80px 0 60px;border-bottom:1px solid var(--border);}
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--dim);border:1px solid var(--border);padding:4px 14px;border-radius:2px;margin-bottom:28px;}
+.cover h1{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--accent);letter-spacing:-1px;line-height:1.1}
+.cover h1 span{color:var(--blue)}
+.cover-sub{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:12px;letter-spacing:3px}
+.meta{display:flex;justify-content:center;gap:40px;margin-top:40px;flex-wrap:wrap}
+.mi{text-align:center}
+.mi-l{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
+.mi-v{font-family:var(--mono);font-size:18px;color:var(--accent);font-weight:700;margin-top:4px}
+.toc{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:24px;margin-top:40px;columns:2;column-gap:24px}
+.toc-h{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;column-span:all}
+.toc a{display:block;font-family:var(--mono);font-size:12px;color:var(--dim);text-decoration:none;padding:4px 0;break-inside:avoid}
+.toc a:hover{color:var(--accent)}
+.tn{color:var(--border);margin-right:8px}
+section{margin-top:56px}
+.st{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim);margin-bottom:8px}
+section>h2{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:24px}
+h3{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin:28px 0 12px}
+p{margin-bottom:14px;color:var(--text)}
+strong{color:var(--accent)}
+.plus{color:var(--green);font-family:var(--mono);font-weight:700}
+.minus{color:#d97070;font-family:var(--mono);font-weight:700}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;margin-right:4px}
+.tp{background:rgba(91,171,124,.15);color:var(--green);border:1px solid rgba(91,171,124,.3)}
+.td{background:rgba(58,123,213,.15);color:var(--blue);border:1px solid rgba(58,123,213,.3)}
+.ta{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+.tc{background:rgba(201,64,64,.15);color:var(--red);border:1px solid rgba(201,64,64,.3)}
+
+/* ─── FACTION CARDS ─── */
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+.fc{border:1px solid var(--border);border-radius:6px;padding:20px;background:var(--bg2);position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.fc.b::before{background:var(--blue)}.fc.r::before{background:var(--red)}.fc.g::before{background:var(--gold)}
+.fc.b{box-shadow:0 0 40px var(--blue-g)}.fc.r{box-shadow:0 0 40px var(--red-g)}.fc.g{box-shadow:0 0 40px var(--gold-g)}
+.fn{font-family:var(--mono);font-size:12px;font-weight:700}
+.fc.b .fn{color:var(--blue)}.fc.r .fn{color:var(--red)}.fc.g .fn{color:var(--gold)}
+.fz{font-size:18px;color:var(--accent);margin:4px 0 12px;font-weight:700}
+.fd{font-size:13px;color:var(--dim);line-height:1.6}
+
+/* ─── ROLES ─── */
+.rr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.rb{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:14px}
+.rt{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+.rn{font-size:16px;font-weight:700;color:var(--accent);margin:4px 0 8px}
+.rd{font-size:13px;color:var(--dim);line-height:1.6}
+.rdeck{display:inline-block;font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:2px;padding:2px 8px;margin-top:8px}
+
+/* ─── STATS ─── */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:18px 14px;text-align:center}
+.si{font-size:22px;margin-bottom:8px}
+.se{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.sz{font-size:16px;font-weight:700;color:var(--accent);margin:4px 0}
+.sn{font-size:12px;color:var(--dim);line-height:1.5;margin-top:6px}
+
+/* ─── RULE BLOCKS ─── */
+.rb2{background:var(--bg3);border-left:3px solid var(--blue);border-radius:0 4px 4px 0;padding:14px 16px;margin:16px 0;font-size:13px;color:var(--dim);line-height:1.7}
+.rb2.w{border-left-color:var(--gold)}.rb2.d{border-left-color:var(--red)}.rb2.g{border-left-color:var(--green)}
+
+/* ─── TABLES ─── */
+.dt{width:100%;border-collapse:collapse;margin-top:16px;font-family:var(--mono);font-size:14px}
+.dt th{background:var(--bg3);color:var(--dim);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;text-align:left;border-bottom:1px solid var(--border)}
+.dt td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text)}
+.dt tr:last-child td{border-bottom:none}
+.dr{color:var(--gold);font-weight:700;font-size:18px}
+.dm{color:var(--accent);font-weight:700}
+.drr{font-size:11px;color:var(--dim)}
+.at{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.at th{background:var(--bg3);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.at td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.at tr:last-child td{border-bottom:none}
+
+/* ─── CARD TYPES ─── */
+.ctl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.ct{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px}
+.ctt{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.ct-h .ctt{color:#6b9adf}.ct-c .ctt{color:var(--purple)}.ct-a .ctt{color:var(--green)}.ct-cr .ctt{color:#d97070}
+.ctn{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.ctd{font-size:13px;color:var(--dim);line-height:1.6}
+
+/* ─── CARD COMPOSITION ─── */
+.comp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.comp-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
+.comp-num{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent);line-height:1}
+.comp-pct{font-family:var(--mono);font-size:11px;color:var(--dim);margin:2px 0 6px}
+.comp-name{font-size:13px;color:var(--text)}
+.comp-bar{height:3px;border-radius:2px;margin-top:8px}
+
+/* ─── FACTION ASYMMETRY ─── */
+.asym-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.asym-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px;position:relative;overflow:hidden}
+.asym-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.asym-card.b::before{background:var(--blue)}.asym-card.r::before{background:var(--red)}.asym-card.g::before{background:var(--gold)}
+.asym-name{font-family:var(--mono);font-size:11px;font-weight:700;margin-bottom:10px}
+.asym-card.b .asym-name{color:var(--blue)}.asym-card.r .asym-name{color:var(--red)}.asym-card.g .asym-name{color:var(--gold)}
+.asym-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0}
+.asym-type{color:var(--dim)}
+.asym-val{font-family:var(--mono);font-weight:700;color:var(--accent)}
+
+/* ─── HAND LIMIT ─── */
+.hand-vis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.hand-zone{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px}
+.hand-role{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.hand-cards{display:flex;gap:6px;margin-bottom:10px}
+.card-slot{width:42px;height:60px;background:var(--bg3);border:1px dashed var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--dim)}
+.card-slot.filled{background:rgba(58,123,213,0.1);border:1px solid rgba(58,123,213,0.3);border-style:solid;color:var(--blue)}
+.card-slot.hand-limit{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);color:var(--gold)}
+.hand-note{font-size:12px;color:var(--dim);line-height:1.5}
+
+/* ─── MAP NODES ─── */
+.node-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.node-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.node-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.node-info{flex:1}
+.node-name{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.node-en{font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px}
+.node-bonus{font-size:12px;color:var(--green);font-family:var(--mono)}
+.node-init{font-size:11px;color:var(--dim);margin-top:4px}
+
+/* ─── SAMPLE CARDS ─── */
+.sc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.ev{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:13px;position:relative}
+.ev::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:8px 8px 0 0}
+.ev.b::before{background:var(--blue)}.ev.r::before{background:var(--red)}.ev.g::before{background:var(--gold)}.ev.cr::before{background:#d97070}
+.evf{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.ev.b .evf{color:var(--blue)}.ev.r .evf{color:var(--red)}.ev.g .evf{color:var(--gold)}.ev.cr .evf{color:#d97070}
+.evn{font-size:14px;font-weight:700;color:var(--accent);line-height:1.3;margin-bottom:10px}
+.eve{font-family:var(--mono);font-size:11px;color:var(--green);margin-bottom:4px}
+.eve.neg{color:#d97070}
+.evfl{font-size:11px;color:var(--dim);font-style:italic;margin-top:8px;line-height:1.5;border-top:1px solid var(--border);padding-top:8px}
+
+/* ─── TENSION ─── */
+.tt{display:flex;align-items:stretch;border-radius:6px;overflow:hidden;margin-top:20px;height:56px;border:1px solid var(--border)}
+.tz{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:8px 12px;text-align:center}
+.tz-p{background:rgba(58,123,213,.12);flex:7}.tz-c{background:rgba(201,168,76,.12);flex:2;border-left:1px solid var(--border);border-right:1px solid var(--border)}.tz-w{background:rgba(201,64,64,.16);flex:1}
+.tl{font-family:var(--mono);font-size:11px;font-weight:700}
+.tz-p .tl{color:var(--blue)}.tz-c .tl{color:var(--gold)}.tz-w .tl{color:var(--red)}
+.tr2{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:2px}
+
+/* ─── VICTORY ─── */
+.vl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.vi{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--dim);border-radius:0 6px 6px 0;padding:16px}
+.vi.h{border-left-color:var(--gold)}.vi.e{border-left-color:var(--green)}.vi.m{border-left-color:var(--red)}.vi.d{border-left-color:var(--blue)}.vi.c{border-left-color:var(--purple)}
+.vn2{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px}
+.vn{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.vt{font-family:var(--mono);font-size:11px;color:var(--gold);background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:3px;padding:6px 10px;margin-bottom:8px}
+.vd{font-size:13px;color:var(--dim);line-height:1.6}
+
+/* ─── ACTIONS ─── */
+.al{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.ai{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.an{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--border);line-height:1;flex-shrink:0;width:24px}
+.att{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.ad{font-size:13px;color:var(--dim);line-height:1.5}
+
+@media(max-width:600px){
+  .fg,.sg,.comp-grid,.asym-grid,.ctl,.vl,.al,.hand-vis,.node-grid,.sc-grid,.rr{grid-template-columns:1fr}
+  .toc{columns:1}
+  .cover h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">桌遊設計稿 v2.0 — 完整整合版</div>
+  <h1>APAC<br><span>Balance of Power</span></h1>
+  <div class="cover-sub">亞太權力遊戲 · 1950s to Present</div>
+  <div class="meta">
+    <div class="mi"><div class="mi-l">Players</div><div class="mi-v">6</div></div>
+    <div class="mi"><div class="mi-l">Duration</div><div class="mi-v">90–120 min</div></div>
+    <div class="mi"><div class="mi-l">Age</div><div class="mi-v">16+</div></div>
+    <div class="mi"><div class="mi-l">Rounds</div><div class="mi-v">20</div></div>
+    <div class="mi"><div class="mi-l">Hand Limit</div><div class="mi-v">2+2</div></div>
+    <div class="mi"><div class="mi-l">Map Nodes</div><div class="mi-v">10</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <div class="toc-h">目錄</div>
+  <a href="#factions"><span class="tn">01</span>陣營與角色</a>
+  <a href="#stats"><span class="tn">02</span>四大點數</a>
+  <a href="#cards"><span class="tn">03</span>牌組系統</a>
+  <a href="#hand"><span class="tn">04</span>手牌規則（新）</a>
+  <a href="#composition"><span class="tn">05</span>牌組組成（新）</a>
+  <a href="#dice"><span class="tn">06</span>骰子機制</a>
+  <a href="#turn"><span class="tn">07</span>回合流程</a>
+  <a href="#map"><span class="tn">08</span>地圖板塊（新）</a>
+  <a href="#alliance"><span class="tn">09</span>陣營行動</a>
+  <a href="#tension"><span class="tn">10</span>緊張值與戰爭</a>
+  <a href="#victory"><span class="tn">11</span>勝利條件</a>
+  <a href="#samples"><span class="tn">12</span>事件卡範例</a>
+  <a href="#appendix"><span class="tn">13</span>附錄：事件參考表</a>
+</div>
+
+<!-- 01 -->
+<section id="factions">
+  <div class="st">Section 01</div>
+  <h2>陣營與角色</h2>
+  <p>遊戲共分三大陣營，每陣營由 <strong>2 名玩家</strong> 組成，分別扮演不同角色。陣營內部需要協作，以達成共同的勝利條件。</p>
+  <div class="fg">
+    <div class="fc b"><div class="fn">LIBERAL ALLIANCE</div><div class="fz">自由陣營（親美）</div><div class="fd">以美國為首，強調自由貿易、民主價值與集體安全。在外交與經濟上擁有先天優勢，日本、台灣、澳洲為起始控制節點。</div></div>
+    <div class="fc r"><div class="fn">EASTERN BLOC</div><div class="fz">東方陣營（親中俄）</div><div class="fd">以中國、俄羅斯為核心，強調主權優先與戰略縱深。軍事擴張能力強，起始控制南海及中亞走廊。</div></div>
+    <div class="fc g"><div class="fn">NON-ALIGNED MOVEMENT</div><div class="fz">中立陣營</div><div class="fd">東南亞、南亞等中小型國家聯合。高度靈活，起始控制印度與東協，是局勢的關鍵擺錘。</div></div>
+  </div>
+  <h3>每陣營兩種角色</h3>
+  <div class="rr">
+    <div class="rb"><div class="rt">Role A</div><div class="rn">總理（Prime Minister）</div><div class="rd">掌管國內政策，所抽的牌直接影響國家的經濟基礎與社會穩定度。</div><div class="rdeck tag tp">抽牌：經濟 · 社會牌組</div></div>
+    <div class="rb"><div class="rt">Role B</div><div class="rn">國防部長（Defense Minister）</div><div class="rd">掌管對外事務與武力，所抽的牌影響軍事投射力與國際關係。</div><div class="rdeck tag td">抽牌：軍事 · 外交牌組</div></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="stats">
+  <div class="st">Section 02</div>
+  <h2>四大點數</h2>
+  <p>每陣營初始各項點數為 <strong>30</strong>，社會穩定度（HP）另設為 <strong>100</strong>。地圖節點加成每回合自動累加。</p>
+  <div class="sg">
+    <div class="sc"><div class="si">💰</div><div class="se">Economy</div><div class="sz">經濟</div><div class="sn">國內生產力、貿易規模與援助能力</div></div>
+    <div class="sc"><div class="si">⚔️</div><div class="se">Military</div><div class="sz">軍事</div><div class="sn">武力規模與嚇阻力，熱戰時直接決定結果</div></div>
+    <div class="sc"><div class="si">🤝</div><div class="se">Diplomacy</div><div class="sz">外交</div><div class="sn">國際影響力與盟邦關係，也是爭奪節點的資源</div></div>
+    <div class="sc"><div class="si">🏛️</div><div class="se">Stability</div><div class="sz">社會穩定度（HP）</div><div class="sn">歸零觸發政權崩潰，停止行動 2 回合</div></div>
+  </div>
+  <div class="rb2 d" style="margin-top:16px"><strong>政權崩潰：</strong>社會穩定度歸零 → 停止抽牌與行動 2 回合、盟約暫停、以社會穩定度 20 重啟。若兩陣營同時崩潰觸發「混亂結局」。</div>
+</section>
+
+<!-- 03 CARDS -->
+<section id="cards">
+  <div class="st">Section 03</div>
+  <h2>牌組系統</h2>
+  <p>每陣營擁有 <strong>36 張</strong> 獨立牌組，混合洗牌後分置兩個牌堆（見第 05 節組成比例）。另有一個共用的<strong>全球危機牌堆（12 張）</strong>，每三回合翻開一張。</p>
+  <div class="ctl">
+    <div class="ct ct-h"><div class="ctt">Type 01 · Historical</div><div class="ctn">歷史事件牌</div><div class="ctd">以真實亞太歷史事件為背景，效果通常較強但方向固定，並附帶 Trade-off 副作用。</div></div>
+    <div class="ct ct-c"><div class="ctt">Type 02 · Fictional</div><div class="ctn">自訂事件牌</div><div class="ctd">虛構事件，可能包含選擇分支。是設計師平衡各陣營手感的主要調整閥門。</div></div>
+    <div class="ct ct-a"><div class="ctt">Type 03 · Action</div><div class="ctn">主動行動牌</div><div class="ctd">主動打出，不需擲骰，效果立即生效，可對自身或對手產生影響。</div></div>
+    <div class="ct ct-cr"><div class="ctt">Type 04 · Crisis</div><div class="ctn">危機牌</div><div class="ctd">抽到必須立即宣讀並結算，無法跳過。部分危機可用特定行動減輕效果。</div></div>
+  </div>
+  <div class="rb2 w" style="margin-top:20px"><strong>Trade-off 設計原則：</strong>主效果 × 骰子倍數；副作用為固定值，不受骰子影響。<br>例：「越戰泥淖」→ 軍事 <span class="plus">+4×骰</span>，但經濟 <span class="minus">−10（固定）</span>。高骰數讓兩難困境更激烈，而非單純賺大數字。</div>
+</section>
+
+<!-- 04 HAND LIMIT (NEW) -->
+<section id="hand">
+  <div class="st">Section 04 — 新增</div>
+  <h2>手牌規則</h2>
+  <p>手牌規則的目的是在「囤積策略」與「回合緊張感」之間取得平衡。</p>
+
+  <h3>手牌上限：每人 2 張，陣營共 4 張</h3>
+  <div class="hand-vis">
+    <div class="hand-zone">
+      <div class="hand-role">總理（PM）</div>
+      <div class="hand-cards">
+        <div class="card-slot filled">當回合<br>抽到</div>
+        <div class="card-slot hand-limit">手牌<br>留存</div>
+      </div>
+      <div class="hand-note">從「經濟/社會牌組」抽 1 張，加上最多 1 張留存手牌，共 2 張可供選擇出哪一張。</div>
+    </div>
+    <div class="hand-zone">
+      <div class="hand-role">國防部長（DM）</div>
+      <div class="hand-cards">
+        <div class="card-slot filled">當回合<br>抽到</div>
+        <div class="card-slot hand-limit">手牌<br>留存</div>
+      </div>
+      <div class="hand-note">從「軍事/外交牌組」抽 1 張，加上最多 1 張留存手牌，共 2 張可供選擇出哪一張。</div>
+    </div>
+  </div>
+
+  <h3>每回合出牌流程</h3>
+  <div class="rb2">
+    1. 各自抽 1 張牌（PM / DM 各抽各的牌堆）<br>
+    2. 選出 1 張打出（結算），另 1 張可<strong>留存</strong>至下回合當作手牌<br>
+    3. 若已有 1 張留存手牌，此回合手中共 2 張，擇 1 打出，另 1 張繼續留存或棄掉<br>
+    4. 若打出的是危機牌，必須立即宣讀，無法留存
+  </div>
+
+  <h3>第七種陣營行動：弃牌（Discard）</h3>
+  <div class="rb2 g">
+    在「陣營行動」階段，可選擇不執行其他六種行動，改為執行弃牌：<br>
+    <strong>棄掉最多 2 張手牌（PM 與 DM 共同的手牌各最多 1 張），從各自牌堆頂部補回同數量的新牌。</strong><br>
+    代價：放棄本回合所有其他陣營行動機會。不消耗任何點數。
+  </div>
+  <p style="font-size:13px;color:var(--dim);">設計邏輯：讓拿到爛牌的陣營有喘息空間，也讓囤積好牌有代價——因為弃牌本身意味著放棄一次主動行動。</p>
+</section>
+
+<!-- 05 COMPOSITION (NEW) -->
+<section id="composition">
+  <div class="st">Section 05 — 新增</div>
+  <h2>牌組組成（每陣營 36 張）</h2>
+  <p>36 張是桌遊設計的黃金數字：好洗牌、不會太快抽完、足夠讓遊戲進行完整 20 回合。</p>
+
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-num">14</div>
+      <div class="comp-pct">39%</div>
+      <div class="comp-name">歷史事件牌</div>
+      <div class="comp-bar" style="background:rgba(107,154,223,0.6)"></div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">10</div>
+      <div class="comp-pct">28%</div>
+      <div class="comp-name">自訂事件牌</div>
+      <div class="comp-bar" style="background:rgba(155,115,204,0.6)"></div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">8</div>
+      <div class="comp-pct">22%</div>
+      <div class="comp-name">主動行動牌</div>
+      <div class="comp-bar" style="background:rgba(91,171,124,0.6)"></div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">4</div>
+      <div class="comp-pct">11%</div>
+      <div class="comp-name">危機牌</div>
+      <div class="comp-bar" style="background:rgba(217,112,112,0.6)"></div>
+    </div>
+  </div>
+
+  <div class="rb2 w" style="margin-top:20px"><strong>全球危機牌堆（共用）：</strong>獨立的 12 張，三陣營共用，每三回合結束後自動翻開一張，效果對所有陣營生效。不屬於任何陣營的牌組。</div>
+
+  <h3>三陣營牌組不對稱設計</h3>
+  <p>各陣營在 36 張總量不變的前提下，<strong>同一牌型的內容比重可以不同</strong>，反映各自的歷史特性與遊戲手感。</p>
+
+  <div class="asym-grid">
+    <div class="asym-card b">
+      <div class="asym-name">LIBERAL ALLIANCE — 自由陣營</div>
+      <div class="asym-row"><span class="asym-type">歷史事件牌</span><span class="asym-val">14 張</span></div>
+      <div class="asym-row"><span class="asym-type">自訂事件牌</span><span class="asym-val">8 張</span></div>
+      <div class="asym-row"><span class="asym-type">主動行動牌</span><span class="asym-val">10 張</span></div>
+      <div class="asym-row"><span class="asym-type">危機牌</span><span class="asym-val">4 張</span></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--dim)">特色：歷史牌偏向外交/經濟；主動行動牌最多，強調主動干預他人節點。</div>
+    </div>
+    <div class="asym-card r">
+      <div class="asym-name">EASTERN BLOC — 東方陣營</div>
+      <div class="asym-row"><span class="asym-type">歷史事件牌</span><span class="asym-val">16 張</span></div>
+      <div class="asym-row"><span class="asym-type">自訂事件牌</span><span class="asym-val">8 張</span></div>
+      <div class="asym-row"><span class="asym-type">主動行動牌</span><span class="asym-val">8 張</span></div>
+      <div class="asym-row"><span class="asym-type">危機牌</span><span class="asym-val">4 張</span></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--dim)">特色：歷史牌最多（亞太有大量中俄歷史事件可用），偏重軍事事件；Trade-off 副作用較重。</div>
+    </div>
+    <div class="asym-card g">
+      <div class="asym-name">NON-ALIGNED — 中立陣營</div>
+      <div class="asym-row"><span class="asym-type">歷史事件牌</span><span class="asym-val">10 張</span></div>
+      <div class="asym-row"><span class="asym-type">自訂事件牌</span><span class="asym-val">14 張</span></div>
+      <div class="asym-row"><span class="asym-type">主動行動牌</span><span class="asym-val">8 張</span></div>
+      <div class="asym-row"><span class="asym-type">危機牌</span><span class="asym-val">4 張</span></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--dim)">特色：自訂事件牌最多，代表中小國的靈活應對。許多牌有「接受援助」分支，從大陣營獲取資源。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 DICE -->
+<section id="dice">
+  <div class="st">Section 06</div>
+  <h2>骰子機制（1D6）</h2>
+  <p>每次結算「歷史事件牌」或「自訂事件牌」時，由抽牌玩家擲一顆六面骰決定主效果倍數。主動行動牌與副作用不擲骰。</p>
+  <table class="dt">
+    <tr><th>點數</th><th>倍數</th><th>機率</th><th>氛圍</th></tr>
+    <tr><td><span class="dr">1 – 2</span></td><td><span class="dm">× 1</span></td><td><span class="drr">33%（最常見）</span></td><td>事件影響有限，局勢緩慢推進</td></tr>
+    <tr><td><span class="dr">3 – 4</span></td><td><span class="dm">× 2</span></td><td><span class="drr">33%</span></td><td>標準的事件影響力</td></tr>
+    <tr><td><span class="dr">5</span></td><td><span class="dm">× 3</span></td><td><span class="drr">17%（稀少）</span></td><td>事件爆發，點數明顯改變</td></tr>
+    <tr><td><span class="dr">6</span></td><td><span class="dm">× 4</span></td><td><span class="drr">17%（稀少）</span></td><td>歷史性事件，局面巨變，宣讀特殊台詞</td></tr>
+  </table>
+</section>
+
+<!-- 07 TURN -->
+<section id="turn">
+  <div class="st">Section 07</div>
+  <h2>回合流程</h2>
+  <p>三個陣營輪流行動，各完成以下七個階段。</p>
+  <div class="rb2" style="border-left-color:#3a7bd5;margin-bottom:8px"><strong>1 / 抽牌</strong> — PM 從「經濟/社會牌組」抽 1 張；DM 從「軍事/外交牌組」抽 1 張。結合手牌留存，各自持有最多 2 張。</div>
+  <div class="rb2 w" style="margin-bottom:8px"><strong>2 / 宣讀與擲骰</strong> — 各自選出 1 張打出，宣讀事件名稱後擲 1D6 查倍數表。</div>
+  <div class="rb2" style="border-left-color:var(--purple);margin-bottom:8px"><strong>3 / 事件結算</strong> — 主效果（×骰數）與副作用（固定值）同步更新至點數版。</div>
+  <div class="rb2 g" style="margin-bottom:8px"><strong>4 / 節點加成</strong>（新）— 統計陣營持有節點，自動累加對應的每回合點數加成。</div>
+  <div class="rb2" style="border-left-color:#5bab7c;margin-bottom:8px"><strong>5 / 陣營行動（選做，限 1 次）</strong> — 執行七種行動之一，包含新增的「弃牌」選項。</div>
+  <div class="rb2" style="border-left-color:var(--dim);margin-bottom:8px"><strong>6 / 更新緊張值</strong> — 依本回合事件類型更新緊張值軌跡，必要時宣告進入冷戰/熱戰狀態。</div>
+  <div class="rb2 d"><strong>7 / 勝利條件檢查</strong> — 確認是否觸發六種結局中的任一種。若無，輪到下一陣營行動。</div>
+</section>
+
+<!-- 08 MAP (NEW) -->
+<section id="map">
+  <div class="st">Section 08 — 新增</div>
+  <h2>地圖板塊與影響力節點</h2>
+  <p>遊戲板上設置一幅亞太地圖，標示 <strong>10 個關鍵地緣節點</strong>。每個節點放置一個彩色標記代表目前哪個陣營主導。節點是戰略資源，不是要管理的領土系統。</p>
+
+  <div class="rb2 g">
+    <strong>節點加成結算時機：</strong>在每個陣營自己的回合，「陣營行動」結束後、勝利條件檢查前，結算持有節點加成。加成為每回合固定值，不受骰子影響。
+  </div>
+
+  <h3>爭奪節點的方式</h3>
+  <p>在「陣營行動」階段，以下行動可爭奪節點：</p>
+  <div class="rb2 w">
+    <strong>外交爭奪：</strong>消耗外交點數 20，可嘗試將相鄰節點改為己方控制（需外交值高於目標陣營在該節點的「影響力值」）。<br>
+    <strong>軍事佔領：</strong>在熱戰狀態下，軍事值超過對手 50 以上時，可直接奪取對手任一節點。<br>
+    <strong>特定事件卡：</strong>部分自訂事件牌包含「奪取/失去節點」的直接效果。
+  </div>
+
+  <h3>初始節點控制（遊戲開始時）</h3>
+  <div class="node-grid">
+    <div class="node-card"><div class="node-dot" style="background:#3a7bd5"></div><div class="node-info"><div class="node-name">日本</div><div class="node-en">Japan</div><div class="node-bonus">經濟 +6 · 軍事 +4 / 回合</div><div class="node-init">初始：自由陣營（美日同盟）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#3a7bd5"></div><div class="node-info"><div class="node-name">台灣</div><div class="node-en">Taiwan</div><div class="node-bonus">經濟 +5 · 軍事 +4 · 外交 +4 / 回合</div><div class="node-init">初始：自由陣營（高爭議，失去時緊張值 +2）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#3a7bd5"></div><div class="node-info"><div class="node-name">澳洲</div><div class="node-en">Australia</div><div class="node-bonus">經濟 +5 · 外交 +3 / 回合</div><div class="node-init">初始：自由陣營（AUKUS 成員）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#c94040"></div><div class="node-info"><div class="node-name">南海</div><div class="node-en">South China Sea</div><div class="node-bonus">軍事 +6 / 回合</div><div class="node-init">初始：東方陣營（中國主張）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#c94040"></div><div class="node-info"><div class="node-name">中亞走廊</div><div class="node-en">Central Asia</div><div class="node-bonus">經濟 +5 · 外交 +3 / 回合</div><div class="node-init">初始：東方陣營（俄中影響圈）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#c9a84c"></div><div class="node-info"><div class="node-name">印度</div><div class="node-en">India</div><div class="node-bonus">外交 +5 · 經濟 +4 / 回合</div><div class="node-init">初始：中立陣營（不結盟精神）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#c9a84c"></div><div class="node-info"><div class="node-name">東協</div><div class="node-en">ASEAN</div><div class="node-bonus">外交 +5 · 經濟 +3 / 回合</div><div class="node-init">初始：中立陣營（集體不干涉）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#5a6070"></div><div class="node-info"><div class="node-name">朝鮮半島</div><div class="node-en">Korean Peninsula</div><div class="node-bonus">軍事 +5 · 外交 +3 / 回合</div><div class="node-init">初始：未控制（高緊張爭議區）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#5a6070"></div><div class="node-info"><div class="node-name">麻六甲海峽</div><div class="node-en">Strait of Malacca</div><div class="node-bonus">經濟 +8 / 回合</div><div class="node-init">初始：未控制（最高經濟加成節點）</div></div></div>
+    <div class="node-card"><div class="node-dot" style="background:#5a6070"></div><div class="node-info"><div class="node-name">太平洋島鏈</div><div class="node-en">Pacific Islands</div><div class="node-bonus">軍事 +5 / 回合</div><div class="node-init">初始：未控制（近年中美角力前線）</div></div></div>
+  </div>
+
+  <div class="rb2 d" style="margin-top:20px"><strong>台灣特別規則：</strong>台灣是遊戲中唯一同時影響三項點數的節點（經濟、軍事、外交各有加成）。任何陣營失去台灣節點控制，全局緊張值立即 <span class="plus">+2</span>，且無法在同一回合內恢復。</div>
+</section>
+
+<!-- 09 ALLIANCE -->
+<section id="alliance">
+  <div class="st">Section 09</div>
+  <h2>七種陣營行動（每輪限 1 次）</h2>
+  <div class="al">
+    <div class="ai"><div class="an">01</div><div><div class="att">援助（Aid）</div><div class="ad">選擇任一陣營，將自身任意一項點數轉移 10 點給對方。限友好或中立陣營，不可對交戰中的敵方使用。</div></div></div>
+    <div class="ai"><div class="an">02</div><div><div class="att">貿易協定（Trade Deal）</div><div class="ad">與另一陣營達成協議，雙方下回合皆獲得 <span class="plus">經濟 +8</span>。需雙方同意，戰爭時自動終止。</div></div></div>
+    <div class="ai"><div class="an">03</div><div><div class="att">制裁（Sanction）</div><div class="ad">目標陣營 <span class="minus">經濟 −15</span>（固定）。需消耗自身外交 10。若目標外交值高於己方，效果減半。緊張值 <span class="plus">+1</span>。</div></div></div>
+    <div class="ai"><div class="an">04</div><div><div class="att">軍事同盟（Military Pact）</div><div class="ad">本回合合併軍事點數用於戰爭結算。消耗外交 15，同時只能維持一份軍事同盟。</div></div></div>
+    <div class="ai"><div class="an">05</div><div><div class="att">情報戰（Intelligence）</div><div class="ad">從目標陣營手牌中隨機竊取 1 張，可選擇打出或棄掉。消耗軍事 10，且軍事值需高於對手。緊張值 <span class="plus">+1</span>。</div></div></div>
+    <div class="ai"><div class="an">06</div><div><div class="att">媒體攻勢（Media）</div><div class="ad">目標陣營 <span class="minus">社會穩定度 −10</span>（固定）。消耗外交 12，每陣營每三回合限用一次。</div></div></div>
+    <div class="ai"><div class="an">07</div><div><div class="att">弃牌（Discard）⭐ 新增</div><div class="ad">棄掉最多 2 張手牌（PM / DM 各至多 1 張），從各自牌堆頂部補回同數量。放棄所有其他行動機會，不消耗任何點數。</div></div></div>
+  </div>
+</section>
+
+<!-- 10 TENSION -->
+<section id="tension">
+  <div class="st">Section 10</div>
+  <h2>緊張值軌跡與戰爭</h2>
+  <div class="tt">
+    <div class="tz tz-p"><div class="tl">和平時期</div><div class="tr2">0 – 7</div></div>
+    <div class="tz tz-c"><div class="tl">冷戰</div><div class="tr2">8 – 9</div></div>
+    <div class="tz tz-w"><div class="tl">熱戰</div><div class="tr2">10</div></div>
+  </div>
+  <table class="at" style="margin-top:16px">
+    <tr><th>觸發條件</th><th>緊張值</th></tr>
+    <tr><td>任一陣營抽到軍事事件牌</td><td><span class="plus">+1</span></td></tr>
+    <tr><td>執行「制裁」或「情報戰」</td><td><span class="plus">+1</span></td></tr>
+    <tr><td>台灣節點易主</td><td><span class="plus">+2</span></td></tr>
+    <tr><td>任一陣營社會穩定度歸零</td><td><span class="plus">+2</span></td></tr>
+    <tr><td>達成貿易協定或軍事同盟</td><td><span class="minus">−1</span></td></tr>
+    <tr><td>使用外交牌達成「停火協議」</td><td><span class="minus">−2</span></td></tr>
+  </table>
+  <div class="rb2 w" style="margin-top:16px"><strong>冷戰（8–9）：</strong>所有軍事事件主效果額外 ×1.5（四捨五入）。貿易協定經濟加成減半。</div>
+  <div class="rb2 d"><strong>熱戰（10）：</strong>軍事點數最高陣營為攻擊方，最低陣營受攻擊。交戰期間每大回合：各方 <span class="minus">經濟 −5、社會穩定度 −3</span>。軍事差 ≥ 50 時弱方額外 <span class="minus">穩定度 −5</span>。停火需外交 ≥ 50。</div>
+</section>
+
+<!-- 11 VICTORY -->
+<section id="victory">
+  <div class="st">Section 11</div>
+  <h2>六種勝利條件</h2>
+  <div class="vl">
+    <div class="vi h"><div class="vn2">結局 01</div><div class="vn">霸權結局</div><div class="vt">四項點數總和 ≥ 400，對手總和 ＜ 200</div><div class="vd">一個陣營全面碾壓，確立亞太霸主地位。</div></div>
+    <div class="vi e"><div class="vn2">結局 02</div><div class="vn">經濟霸主</div><div class="vt">經濟 ≥ 200，其他兩陣營經濟皆 ＜ 80</div><div class="vd">以絕對的經濟優勢控制亞太供應鏈，無聲勝利。</div></div>
+    <div class="vi m"><div class="vn2">結局 03</div><div class="vn">軍事制霸</div><div class="vt">軍事 ≥ 250，且任一對手在熱戰中穩定度歸零</div><div class="vd">以壓倒性武力瓦解敵方政權，取得區域控制。</div></div>
+    <div class="vi d"><div class="vn2">結局 04</div><div class="vn">外交勝利</div><div class="vt">持有有效盟約 ≥ 5 項，且外交 ≥ 150</div><div class="vd">廣結盟邦，以多邊框架確立國際秩序主導權。</div></div>
+    <div class="vi c"><div class="vn2">結局 05</div><div class="vn">混亂結局</div><div class="vt">任意兩個陣營同時社會穩定度歸零</div><div class="vd">若中立陣營未崩潰，中立陣營以「倖存者」身份獲勝；否則平局。</div></div>
+    <div class="vi"><div class="vn2">結局 06</div><div class="vn">時限結局</div><div class="vt">20 大回合結束，前五種結局均未觸發</div><div class="vd">計算四項點數總和，最高者獲勝；同分比外交；仍同分為平局。</div></div>
+  </div>
+</section>
+
+<!-- 12 SAMPLES -->
+<section id="samples">
+  <div class="st">Section 12</div>
+  <h2>事件卡範例</h2>
+  <div class="sc-grid">
+    <div class="ev b"><div class="evf">Liberal Alliance · PM</div><div class="evn">馬歇爾計畫延伸</div><div class="eve">💰 經濟 +5 ×骰</div><div class="eve">🤝 外交 +3（固定）</div><div class="evfl">「美援的流入重建了戰後亞洲的盟邦，也深化了華盛頓的影響力。」</div></div>
+    <div class="ev b"><div class="evf">Liberal Alliance · DM</div><div class="evn">越戰升級</div><div class="eve">⚔️ 軍事 +6 ×骰</div><div class="eve neg">💰 經濟 −12（副作用）</div><div class="eve neg">🏛️ 穩定度 −8（副作用）</div><div class="evfl">「戰場上的每一步推進，都伴隨著本國街頭的抗議浪潮。」</div></div>
+    <div class="ev r"><div class="evf">Eastern Bloc · PM</div><div class="evn">一帶一路倡議</div><div class="eve">💰 經濟 +6 ×骰</div><div class="eve">🤝 外交 +4（固定）</div><div class="evfl">「基礎建設的投資，是比炮艦更柔軟、更長遠的力量。」</div></div>
+    <div class="ev r"><div class="evf">Eastern Bloc · DM</div><div class="evn">朝鮮半島緊張升溫</div><div class="eve">⚔️ 軍事 +8 ×骰</div><div class="eve neg">🤝 外交 −10（副作用）</div><div class="evfl">「每一次試射，都是給地區各國的一封恐嚇信。」⚠️ 緊張值 +2</div></div>
+    <div class="ev g"><div class="evf">Non-Aligned · PM</div><div class="evn">亞洲四小龍崛起</div><div class="eve">💰 經濟 +7 ×骰</div><div class="eve neg">⚔️ 軍事 −5（副作用）</div><div class="evfl">「把資源投入工廠，而非軍備——小國的生存之道。」</div></div>
+    <div class="ev cr"><div class="evf">All Factions · Crisis</div><div class="evn">亞洲金融風暴</div><div class="eve neg">💰 全陣營 經濟 −15（固定）</div><div class="eve neg">🏛️ 全陣營 穩定度 −10（固定）</div><div class="evfl">「貨幣崩潰的骨牌效應席捲整個地區，無一倖免。」⚠️ 下回合所有貿易協定暫停</div></div>
+  </div>
+</section>
+
+<!-- 13 APPENDIX -->
+<section id="appendix">
+  <div class="st">Section 13</div>
+  <h2>附錄：歷史事件參考表</h2>
+  <table class="at">
+    <tr><th>事件名稱</th><th>年代</th><th>建議陣營</th><th>主要效果</th></tr>
+    <tr><td>韓戰爆發</td><td>1950</td><td><span class="tag td">DM</span><span class="tag ta">ALL</span></td><td>軍 <span class="plus">+高</span>，外 <span class="minus">−中</span>，緊張 <span class="plus">+2</span></td></tr>
+    <tr><td>日美安保條約</td><td>1951</td><td><span class="tag td">DM</span>親美</td><td>軍 <span class="plus">+中</span>，外 <span class="plus">+中</span>，可鞏固日本節點</td></tr>
+    <tr><td>萬隆會議</td><td>1955</td><td><span class="tag td">DM</span>中立</td><td>外 <span class="plus">+高</span>，可招募陣營加入中立</td></tr>
+    <tr><td>文化大革命</td><td>1966</td><td><span class="tag tp">PM</span>東方危機</td><td>穩定度 <span class="minus">−高</span>（危機牌）</td></tr>
+    <tr><td>越戰結束</td><td>1975</td><td><span class="tag ta">ALL</span></td><td>親美：外 <span class="minus">−中</span>；東方：外 <span class="plus">+中</span>；緊張 <span class="minus">−2</span></td></tr>
+    <tr><td>廣場協議</td><td>1985</td><td><span class="tag tp">PM</span>親美</td><td>對中立：經 <span class="plus">+中</span>，但穩定度 <span class="minus">−低</span></td></tr>
+    <tr><td>天安門事件</td><td>1989</td><td><span class="tag tp">PM</span>東方危機</td><td>穩定度 <span class="minus">−高</span>，外 <span class="minus">−中</span></td></tr>
+    <tr><td>亞洲金融風暴</td><td>1997</td><td><span class="tag ta">ALL</span>全陣營危機</td><td>全陣營 經 <span class="minus">−高</span>，穩定度 <span class="minus">−中</span></td></tr>
+    <tr><td>SARS 疫情</td><td>2003</td><td><span class="tag ta">ALL</span>全陣營危機</td><td>全陣營 經 <span class="minus">−中</span>，穩定度 <span class="minus">−低</span></td></tr>
+    <tr><td>南海爭端升溫</td><td>2010s</td><td><span class="tag td">DM</span>東方</td><td>軍 <span class="plus">+中</span>，外 <span class="minus">−中</span>，嘗試奪取南海節點，緊張 <span class="plus">+1</span></td></tr>
+    <tr><td>RCEP 生效</td><td>2022</td><td><span class="tag tp">PM</span>東方/中立</td><td>經 <span class="plus">+中</span>×骰，自動觸發貿易協定（免費）</td></tr>
+    <tr><td>晶片戰爭（出口管制）</td><td>2022</td><td><span class="tag tp">PM</span>親美</td><td>己方經 <span class="plus">+中</span>，目標陣營 經 <span class="minus">−高</span>，與台灣節點連動</td></tr>
+  </table>
+</section>
+
+<div style="margin-top:60px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--dim);border-top:1px solid var(--border);padding-top:24px;">
+  APAC: Balance of Power · Design Draft v2.0 · 規則書完整整合版
+</div>
+</body>
+</html>

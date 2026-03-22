@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APAC: Balance of Power — 地圖遊戲板</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;
+  --border:rgba(255,255,255,0.08);
+  --text:#c8cad4;--dim:#5a6070;
+  --blue:#3a7bd5;--red:#c94040;--gold:#c9a84c;
+  --mono:'Space Mono',monospace;--sans:'Noto Sans TC',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding:16px;}
+h1{font-family:var(--mono);font-size:18px;font-weight:700;color:#e8e0cc;letter-spacing:-0.5px;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim);border:1px solid var(--border);padding:3px 10px;border-radius:2px;}
+.layout{display:grid;grid-template-columns:1fr 260px;gap:12px;}
+.map-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.map-wrap svg{width:100%;display:block;}
+.sidebar{display:flex;flex-direction:column;gap:10px;}
+.faction-bar{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.faction-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;text-transform:uppercase;}
+.faction-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.faction-row:last-child{border-bottom:none;}
+.faction-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.faction-name{font-size:13px;flex:1;}
+.faction-count{font-family:var(--mono);font-size:16px;font-weight:700;}
+.fc-blue .faction-count{color:var(--blue);}
+.fc-red  .faction-count{color:var(--red);}
+.fc-gold .faction-count{color:var(--gold);}
+.fc-neut .faction-count{color:var(--dim);}
+.info-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;flex:1;}
+.info-empty{color:var(--dim);font-size:13px;text-align:center;padding:30px 0;}
+.info-faction{font-family:var(--mono);font-size:9px;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;}
+.info-name{font-size:18px;font-weight:500;color:#e8e0cc;margin-bottom:4px;}
+.info-en{font-family:var(--mono);font-size:11px;color:var(--dim);margin-bottom:12px;}
+.bonus-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.bonus-item{display:flex;align-items:center;gap:8px;font-size:13px;}
+.bonus-icon{width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.b-eco{background:rgba(91,171,124,0.15);color:#5bab7c;}
+.b-mil{background:rgba(201,64,64,0.15);color:#c94040;}
+.b-dip{background:rgba(58,123,213,0.15);color:#3a7bd5;}
+.b-soc{background:rgba(155,115,204,0.15);color:#9b73cc;}
+.info-desc{font-size:12px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;}
+.ctrl-btn{width:100%;margin-top:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:11px;padding:8px;cursor:pointer;transition:background 0.15s;}
+.ctrl-btn:hover{background:rgba(255,255,255,0.08);}
+.legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--dim);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+.help-text{font-size:11px;color:var(--dim);font-family:var(--mono);margin-top:8px;}
+@media(max-width:700px){.layout{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="badge">GAME BOARD v1.0</div>
+    <h1 style="margin-top:6px;">APAC: Balance of Power — 地圖遊戲板</h1>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>自由陣營</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>東方陣營</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>中立陣營</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a4050;border:1px solid #5a6070"></div>未控制</div>
+  </div>
+</div>
+<p class="help-text" style="margin-bottom:10px;">點擊節點查看詳情並切換控制陣營 (→ 自由 → 東方 → 中立 → 未控制 →)</p>
+
+<div class="layout">
+  <div class="map-wrap">
+    <svg id="map" viewBox="0 0 680 470" xmlns="http://www.w3.org/2000/svg">
+      <rect width="680" height="470" fill="#0a1018"/>
+      <!-- Subtle grid lines for ocean -->
+      <line x1="0" y1="156" x2="680" y2="156" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="0" y1="234" x2="680" y2="234" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="0" y1="312" x2="680" y2="312" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="0" y1="390" x2="680" y2="390" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="170" y1="0" x2="170" y2="470" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="340" y1="0" x2="340" y2="470" stroke="#0e1520" stroke-width="0.5"/>
+      <line x1="510" y1="0" x2="510" y2="470" stroke="#0e1520" stroke-width="0.5"/>
+
+      <!-- ── LANDMASSES ── -->
+      <!-- Main Asia continent -->
+      <path d="M40,38 Q120,30 220,36 Q310,36 390,40 Q440,42 468,62 Q488,80 485,108 Q480,132 458,148 Q432,162 408,170 Q378,180 352,202 Q322,226 295,255 Q268,280 250,305 Q236,320 218,308 Q198,285 175,264 Q150,248 128,258 Q106,272 95,300 Q80,290 68,260 Q50,222 42,180 Q38,140 40,80 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Indian subcontinent -->
+      <path d="M128,258 Q158,246 180,258 Q198,272 200,310 Q198,355 182,392 Q165,412 148,400 Q128,376 116,340 Q106,308 112,278 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Korean Peninsula -->
+      <path d="M398,108 Q412,103 420,116 Q418,138 408,148 Q396,146 388,132 Q386,116 398,108 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Japan (main islands simplified) -->
+      <path d="M432,64 Q465,56 488,70 Q498,84 490,100 Q476,112 455,112 Q432,108 420,94 Q418,78 432,64 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Kyushu small -->
+      <ellipse cx="418" cy="112" rx="8" ry="6" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Taiwan -->
+      <ellipse cx="396" cy="174" rx="7" ry="11" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Hainan -->
+      <ellipse cx="358" cy="200" rx="9" ry="6" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Philippines (simplified) -->
+      <ellipse cx="406" cy="218" rx="10" ry="22" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Malay Peninsula -->
+      <path d="M250,305 Q264,295 270,318 Q268,352 260,372 Q252,362 250,340 Q246,320 248,305 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Sumatra -->
+      <path d="M248,305 Q285,292 302,308 Q296,324 272,330 Q252,326 248,312 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Borneo -->
+      <ellipse cx="322" cy="306" rx="32" ry="24" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Java -->
+      <path d="M278,334 Q322,326 345,338 Q340,350 312,352 Q283,350 276,340 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Sulawesi (simplified) -->
+      <ellipse cx="378" cy="320" rx="12" ry="18" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- New Guinea -->
+      <path d="M430,280 Q490,268 520,280 Q528,296 516,308 Q492,316 460,310 Q438,302 430,288 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Australia -->
+      <path d="M388,342 Q490,328 572,352 Q602,374 596,420 Q585,456 548,466 Q500,475 452,464 Q408,450 390,416 Q378,388 388,358 Z"
+        fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- New Zealand -->
+      <ellipse cx="596" cy="440" rx="9" ry="16" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <ellipse cx="586" cy="462" rx="5" ry="9" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+      <!-- Sri Lanka -->
+      <ellipse cx="174" cy="336" rx="5" ry="7" fill="#1a2030" stroke="#252d3e" stroke-width="0.8"/>
+
+      <!-- ── CONNECTION LINES between nodes (thin, dashed) ── -->
+      <g stroke="#1e2535" stroke-width="0.8" stroke-dasharray="3 4" fill="none" opacity="0.6">
+        <line x1="448" y1="88" x2="404" y2="126"/>
+        <line x1="404" y1="126" x2="396" y2="174"/>
+        <line x1="396" y1="174" x2="358" y2="220"/>
+        <line x1="358" y1="220" x2="290" y2="258"/>
+        <line x1="290" y1="258" x2="258" y2="308"/>
+        <line x1="358" y1="220" x2="480" y2="405"/>
+        <line x1="290" y1="258" x2="86" y2="72"/>
+        <line x1="290" y1="258" x2="158" y2="310"/>
+        <line x1="480" y1="405" x2="560" y2="258"/>
+      </g>
+
+      <!-- ── NODES ── (id, cx, cy, faction, name, nameEn) -->
+      <g id="nodes">
+        <g class="map-node" id="n-central-asia" data-cx="86" data-cy="72" transform="translate(86,72)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#888780" stroke-width="1.5"/>
+          <circle r="9" class="node-fill" fill="#3a4050"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">中亞走廊</text>
+        </g>
+        <g class="map-node" id="n-india" data-cx="158" data-cy="310" transform="translate(158,310)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#c9a84c" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#c9a84c" opacity="0.7"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">印度</text>
+        </g>
+        <g class="map-node" id="n-korea" data-cx="404" data-cy="126" transform="translate(404,126)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#888780" stroke-width="1.5"/>
+          <circle r="9" class="node-fill" fill="#3a4050"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">朝鮮半島</text>
+        </g>
+        <g class="map-node" id="n-japan" data-cx="448" data-cy="88" transform="translate(448,88)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#3a7bd5" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#3a7bd5" opacity="0.7"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">日本</text>
+        </g>
+        <g class="map-node" id="n-taiwan" data-cx="396" data-cy="174" transform="translate(396,174)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#3a7bd5" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#3a7bd5" opacity="0.7"/>
+          <text y="-20" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">台灣</text>
+        </g>
+        <g class="map-node" id="n-south-sea" data-cx="358" data-cy="220" transform="translate(358,220)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#c94040" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#c94040" opacity="0.7"/>
+          <text y="-20" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">南海</text>
+        </g>
+        <g class="map-node" id="n-asean" data-cx="290" data-cy="258" transform="translate(290,258)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#c9a84c" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#c9a84c" opacity="0.7"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">東協</text>
+        </g>
+        <g class="map-node" id="n-malacca" data-cx="258" data-cy="308" transform="translate(258,308)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#888780" stroke-width="1.5"/>
+          <circle r="9" class="node-fill" fill="#3a4050"/>
+          <text y="-20" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">麻六甲</text>
+        </g>
+        <g class="map-node" id="n-australia" data-cx="480" data-cy="405" transform="translate(480,405)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#3a7bd5" stroke-width="2"/>
+          <circle r="9" class="node-fill" fill="#3a7bd5" opacity="0.7"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">澳洲</text>
+        </g>
+        <g class="map-node" id="n-pacific" data-cx="560" data-cy="258" transform="translate(560,258)">
+          <circle r="14" class="node-ring" fill="#1e2535" stroke="#888780" stroke-width="1.5"/>
+          <circle r="9" class="node-fill" fill="#3a4050"/>
+          <text y="28" text-anchor="middle" fill="#888780" font-size="10" font-family="'Noto Sans TC',sans-serif">太平洋島鏈</text>
+        </g>
+      </g>
+
+      <!-- Region labels -->
+      <text x="100" y="120" fill="#1e2840" font-size="11" font-family="'Space Mono',monospace">CENTRAL ASIA</text>
+      <text x="45" y="200" fill="#1e2840" font-size="11" font-family="'Space Mono',monospace">SOUTH ASIA</text>
+      <text x="430" y="48" fill="#1e2840" font-size="10" font-family="'Space Mono',monospace">E. ASIA</text>
+      <text x="280" y="238" fill="#1e2840" font-size="10" font-family="'Space Mono',monospace">S.E. ASIA</text>
+      <text x="440" y="380" fill="#1e2840" font-size="11" font-family="'Space Mono',monospace">AUSTRALIA</text>
+      <text x="530" y="220" fill="#1e2840" font-size="11" font-family="'Space Mono',monospace">PACIFIC</text>
+    </svg>
+  </div>
+
+  <div class="sidebar">
+    <div class="faction-bar">
+      <div class="faction-title">節點控制數</div>
+      <div class="faction-row fc-blue">
+        <div class="faction-dot" style="background:var(--blue)"></div>
+        <div class="faction-name">自由陣營</div>
+        <div class="faction-count" id="count-blue">3</div>
+      </div>
+      <div class="faction-row fc-red">
+        <div class="faction-dot" style="background:var(--red)"></div>
+        <div class="faction-name">東方陣營</div>
+        <div class="faction-count" id="count-red">2</div>
+      </div>
+      <div class="faction-row fc-gold">
+        <div class="faction-dot" style="background:var(--gold)"></div>
+        <div class="faction-name">中立陣營</div>
+        <div class="faction-count" id="count-gold">2</div>
+      </div>
+      <div class="faction-row fc-neut">
+        <div class="faction-dot" style="background:#3a4050;border:1px solid #5a6070"></div>
+        <div class="faction-name">未控制</div>
+        <div class="faction-count" id="count-neut">3</div>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div id="info-content">
+        <div class="info-empty">← 點擊地圖上的節點<br>查看詳細資訊</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const nodeData = {
+  'n-central-asia': {
+    name:'中亞走廊', en:'Central Asia Corridor',
+    bonuses:[{type:'eco',label:'經濟','val':'+5 / 回合'},{type:'dip',label:'外交','val':'+3 / 回合'}],
+    desc:'絲路的現代延伸，控制此節點代表掌握能源通道與內陸貿易路線，是一帶一路的核心樞紐。',
+    geo:'哈薩克、烏茲別克、塔吉克一帶',
+    faction:'neutral'
+  },
+  'n-india': {
+    name:'印度', en:'Republic of India',
+    bonuses:[{type:'dip',label:'外交','val':'+5 / 回合'},{type:'eco',label:'經濟','val':'+4 / 回合'}],
+    desc:'不結盟運動的精神發源地。擁有龐大人口與快速增長的經濟，是各大國競相拉攏的關鍵擺錘。',
+    geo:'南亞次大陸',
+    faction:'gold'
+  },
+  'n-korea': {
+    name:'朝鮮半島', en:'Korean Peninsula',
+    bonuses:[{type:'mil',label:'軍事','val':'+5 / 回合'},{type:'dip',label:'外交','val':'+3 / 回合'}],
+    desc:'東亞最危險的火藥庫。控制朝鮮半島節點代表在南韓建立前進基地，或掌握北韓的行動能力。緊張值敏感區。',
+    geo:'朝鮮半島全境',
+    faction:'neutral'
+  },
+  'n-japan': {
+    name:'日本', en:'Japan',
+    bonuses:[{type:'eco',label:'經濟','val':'+6 / 回合'},{type:'mil',label:'軍事','val':'+4 / 回合'}],
+    desc:'美日同盟的核心。作為科技強國與先進製造業基地，控制日本節點等同取得前進太平洋的戰略跳板。',
+    geo:'日本列島',
+    faction:'blue'
+  },
+  'n-taiwan': {
+    name:'台灣', en:'Taiwan',
+    bonuses:[{type:'eco',label:'經濟','val':'+5 / 回合'},{type:'mil',label:'軍事','val':'+4 / 回合'},{type:'dip',label:'外交','val':'+4 / 回合'}],
+    desc:'半導體供應鏈的心臟。台灣的控制權是本遊戲最高爭議節點，同時影響經濟、軍事、外交三項——失去台灣節點的陣營將觸發緊張值 +2。',
+    geo:'台灣本島及離島',
+    faction:'blue'
+  },
+  'n-south-sea': {
+    name:'南海', en:'South China Sea',
+    bonuses:[{type:'mil',label:'軍事','val':'+6 / 回合'}],
+    desc:'全球貿易最繁忙的水道之一。誰主導南海，誰就能影響亞太海上通道的安全——每年約 3 兆美元的貿易經過此地。',
+    geo:'南海全域（含九段線爭議區）',
+    faction:'red'
+  },
+  'n-asean': {
+    name:'東協', en:'ASEAN Bloc',
+    bonuses:[{type:'dip',label:'外交','val':'+5 / 回合'},{type:'eco',label:'經濟','val':'+3 / 回合'}],
+    desc:'東南亞十國聯合體。東協奉行不干涉原則，但其集體外交影響力不容忽視。控制此節點可在「外交行動」時獲得額外 +1 票籌碼。',
+    geo:'泰國、越南、菲律賓、印尼等十國',
+    faction:'gold'
+  },
+  'n-malacca': {
+    name:'麻六甲海峽', en:'Strait of Malacca',
+    bonuses:[{type:'eco',label:'經濟','val':'+8 / 回合'}],
+    desc:'亞洲的石油動脈。全球超過 25% 的海上貿易、80% 的中國石油進口通過此地。封鎖麻六甲等同按下亞太經濟的暫停鍵。',
+    geo:'馬來西亞—印尼—新加坡之間的海峽',
+    faction:'neutral'
+  },
+  'n-australia': {
+    name:'澳洲', en:'Australia',
+    bonuses:[{type:'eco',label:'經濟','val':'+5 / 回合'},{type:'dip',label:'外交','val':'+3 / 回合'}],
+    desc:'AUKUS 同盟的南方支柱。作為主要礦產出口國，控制澳洲節點同時獲得稀土資源優勢，在「晶片戰爭」等事件卡上可獲得額外加成。',
+    geo:'澳大利亞大陸',
+    faction:'blue'
+  },
+  'n-pacific': {
+    name:'太平洋島鏈', en:'Pacific Island Chain',
+    bonuses:[{type:'mil',label:'軍事','val':'+5 / 回合'}],
+    desc:'美中爭奪的最新前線。從關島到索羅門群島，小島國家的港口使用權決定了太平洋的制海能力。近年中國積極介入索羅門群島。',
+    geo:'密克羅尼西亞、美拉尼西亞島群',
+    faction:'neutral'
+  }
+};
+
+const factionCfg = {
+  blue: {label:'自由陣營控制',color:'var(--blue)',stroke:'#3a7bd5'},
+  red:  {label:'東方陣營控制',color:'var(--red)', stroke:'#c94040'},
+  gold: {label:'中立陣營控制',color:'var(--gold)',stroke:'#c9a84c'},
+  neutral:{label:'未控制（中立）',color:'#5a6070',stroke:'#888780'}
+};
+const factionCycle = ['blue','red','gold','neutral'];
+const bonusIcons = {eco:'$',mil:'⚔',dip:'◇',soc:'♦'};
+const bonusClass = {eco:'b-eco',mil:'b-mil',dip:'b-dip',soc:'b-soc'};
+
+let selected = null;
+
+function updateCounts(){
+  const counts = {blue:0,red:0,gold:0,neutral:0};
+  Object.values(nodeData).forEach(n=>counts[n.faction]++);
+  document.getElementById('count-blue').textContent=counts.blue;
+  document.getElementById('count-red').textContent=counts.red;
+  document.getElementById('count-gold').textContent=counts.gold;
+  document.getElementById('count-neut').textContent=counts.neutral;
+}
+
+function applyFaction(id, faction){
+  const cfg = factionCfg[faction];
+  const g = document.getElementById(id);
+  g.querySelector('.node-ring').setAttribute('stroke', cfg.stroke);
+  g.querySelector('.node-ring').setAttribute('stroke-width', faction==='neutral'?'1.5':'2');
+  g.querySelector('.node-fill').setAttribute('fill', faction==='neutral'?'#3a4050':cfg.stroke);
+  g.querySelector('.node-fill').setAttribute('opacity', faction==='neutral'?'1':'0.7');
+}
+
+function renderInfo(id){
+  const d = nodeData[id];
+  const fc = factionCfg[d.faction];
+  const bonusHtml = d.bonuses.map(b=>`
+    <div class="bonus-item">
+      <div class="bonus-icon ${bonusClass[b.type]}">${bonusIcons[b.type]}</div>
+      <span style="color:var(--text)">${b.label}</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:12px;color:#5bab7c;font-weight:700">${b.val}</span>
+    </div>`).join('');
+  document.getElementById('info-content').innerHTML=`
+    <div class="info-faction" style="color:${fc.color}">${fc.label}</div>
+    <div class="info-name">${d.name}</div>
+    <div class="info-en">${d.en}</div>
+    <div class="bonus-list">${bonusHtml}</div>
+    <div class="info-desc">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:6px;font-family:var(--mono)">REGION: ${d.geo}</div>
+      ${d.desc}
+    </div>
+    <button class="ctrl-btn" onclick="cycleControl('${id}')">切換控制陣營 →</button>
+  `;
+}
+
+function cycleControl(id){
+  const d = nodeData[id];
+  const idx = factionCycle.indexOf(d.faction);
+  d.faction = factionCycle[(idx+1)%4];
+  applyFaction(id, d.faction);
+  updateCounts();
+  renderInfo(id);
+}
+
+document.querySelectorAll('.map-node').forEach(g=>{
+  g.style.cursor='pointer';
+  g.addEventListener('click',()=>{
+    const id=g.id;
+    document.querySelectorAll('.map-node .node-ring').forEach(r=>{
+      const curStroke = r.getAttribute('stroke');
+      r.setAttribute('stroke-opacity','1');
+    });
+    selected=id;
+    renderInfo(id);
+  });
+});
+
+updateCounts();
+</script>
+</body>
+</html>

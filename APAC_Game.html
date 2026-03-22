@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APAC: Balance of Power</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500&display=swap');
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#0f1219;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --text:#c8cad4;--dim:#5a6070;--accent:#e8e0cc;
+  --blue:#3a7bd5;--red:#c94040;--gold:#c9a84c;
+  --green:#5bab7c;--purple:#9b73cc;
+  --mono:'Space Mono',monospace;--sans:'Noto Sans TC',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+/* HEADER */
+.hdr{background:var(--bg4);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap}
+.logo{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
+.rnd{font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap}
+.ten-wrap{flex:1;display:flex;align-items:center;gap:8px;min-width:180px}
+.ten-lbl{font-family:var(--mono);font-size:9px;color:var(--dim);white-space:nowrap}
+.ten-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.ten-fill{height:100%;border-radius:3px;transition:width .5s,background .5s}
+.ten-val{font-family:var(--mono);font-size:10px;font-weight:700;min-width:16px}
+.act-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:2px;border:1px solid;white-space:nowrap}
+/* MAIN GRID */
+.main{flex:1;display:grid;grid-template-columns:260px 1fr 220px;gap:0;overflow:hidden}
+/* MAP */
+.map-col{border-right:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;background:var(--bg4)}
+.map-col svg{flex:1;width:100%}
+/* CENTER */
+.center-col{overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+/* STATS */
+.stats-col{border-left:1px solid var(--border);overflow-y:auto;padding:8px}
+/* FACTION STAT CARD */
+.fsc{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;border-top:2px solid;margin-bottom:8px}
+.fsc-name{font-family:var(--mono);font-size:9px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px}
+.stat-row:last-of-type{border-bottom:none}
+.stat-lbl{color:var(--dim)}
+.stat-v{font-family:var(--mono);font-weight:700;font-size:12px}
+.soc-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:5px;overflow:hidden}
+.soc-fill{height:100%;background:var(--purple);transition:width .4s}
+.node-mini{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+.ntag{font-family:var(--mono);font-size:8px;padding:1px 4px;border-radius:2px;border:1px solid}
+/* PHASE TITLE */
+.ptitle{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+/* CARDS */
+.cards-row{display:flex;gap:8px;flex-wrap:wrap}
+.gcard{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;width:148px;cursor:pointer;transition:border-color .15s,transform .1s;flex-shrink:0;position:relative}
+.gcard:hover{border-color:var(--border2);transform:translateY(-2px)}
+.gcard.sel{border-width:1.5px}
+.gcard.played{opacity:.4;cursor:default;transform:none}
+.ctag{font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.cname{font-size:12px;font-weight:500;color:var(--accent);line-height:1.3;margin-bottom:6px}
+.ceff{font-family:var(--mono);font-size:9px;color:var(--green);margin-bottom:2px}
+.ceff.neg{color:#d97070}
+.cflv{font-size:9px;color:var(--dim);font-style:italic;border-top:1px solid var(--border);padding-top:5px;margin-top:5px;line-height:1.4}
+/* BUTTONS */
+.btn{font-family:var(--mono);font-size:10px;padding:7px 12px;border-radius:3px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;transition:background .15s}
+.btn:hover:not(:disabled){background:rgba(255,255,255,.08)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-b{border-color:var(--blue);color:var(--blue)}
+.btn-b:hover:not(:disabled){background:rgba(58,123,213,.1)}
+.btn-g{border-color:var(--gold);color:var(--gold)}
+.btn-g:hover:not(:disabled){background:rgba(201,168,76,.1)}
+.btn-r{border-color:var(--red);color:var(--red)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+/* DICE */
+.dice-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
+.dface{font-size:44px;display:block;transition:all .1s}
+.dmult{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--gold);margin-top:6px}
+/* EFFECT LOG */
+.elog{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:11px}
+.el-plus{color:var(--green)}.el-minus{color:#d97070}
+/* ACTIONS */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.abtn{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.abtn:hover:not([disabled]){border-color:var(--border2);background:rgba(255,255,255,.02)}
+.abtn[disabled]{opacity:.3;cursor:default;pointer-events:none}
+.atitle{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold);margin-bottom:3px}
+.acost{font-family:var(--mono);font-size:8px;color:var(--dim);margin-bottom:3px}
+.adesc{font-size:10px;color:var(--dim);line-height:1.4}
+/* LOG */
+.glog{background:var(--bg3);border-radius:4px;border:1px solid var(--border);padding:8px;max-height:100px;overflow-y:auto;font-size:10px;font-family:var(--mono);color:var(--dim)}
+.le{padding:2px 0;border-bottom:1px solid var(--border)}
+.le:last-child{border-bottom:none}
+/* SELECT */
+select{background:var(--bg2);color:var(--text);border:1px solid var(--border2);padding:6px;border-radius:3px;width:100%;font-family:var(--mono);font-size:10px;margin-top:6px}
+/* BADGES */
+.sbadge{font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:2px}
+.sb-col{background:rgba(201,64,64,.15);color:#d97070;border:1px solid rgba(201,64,64,.3)}
+.sb-war{background:rgba(201,64,64,.12);color:#c94040;border:1px solid rgba(201,64,64,.2)}
+.sb-tr{background:rgba(91,171,124,.1);color:var(--green);border:1px solid rgba(91,171,124,.25)}
+/* PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:12px}
+/* DIVIDER */
+.div-lbl{font-family:var(--mono);font-size:9px;color:var(--dim);margin:10px 0 6px;letter-spacing:1px;text-transform:uppercase}
+/* VICTORY */
+.victory{padding:40px;max-width:600px;margin:0 auto;text-align:center}
+.v-title{font-family:var(--mono);font-size:24px;font-weight:700;margin-bottom:8px}
+.v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
+.v-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;border-top:2px solid}
+/* CRISIS FLASH */
+@keyframes flash{0%,100%{opacity:1}50%{opacity:.4}}
+.crisis-flash{animation:flash .4s linear 3}
+/* Scrollbars */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app"><div style="padding:40px;font-family:var(--mono);color:var(--dim)">Loading...</div></div>
+<script>
+// ═══ CARD DATA ═══
+
+const BLUE_PM=[
+  {id:'bp1',name:'馬歇爾計畫延伸',type:'h',dice:true,fx:[{t:'self',s:'eco',v:5,m:true},{t:'self',s:'dip',v:3,m:false}],sfx:[],ten:0,flv:'美援重建了戰後亞洲的盟邦，也深化了華盛頓的影響力。'},
+  {id:'bp2',name:'廣場協議（Plaza Accord）',type:'h',dice:true,fx:[{t:'self',s:'eco',v:6,m:true}],sfx:[{s:'soc',v:-5}],ten:0,flv:'日元升值帶來短暫繁榮，也埋下了泡沫危機的種子。'},
+  {id:'bp3',name:'半導體出口管制',type:'f',dice:true,fx:[{t:'self',s:'eco',v:4,m:true},{t:'red',s:'eco',v:-10,m:false}],sfx:[],ten:1,flv:'晶片成為地緣政治的新武器，科技脫鉤時代正式來臨。'},
+  {id:'bp4',name:'AUKUS 三邊協議',type:'f',dice:true,fx:[{t:'self',s:'dip',v:6,m:true},{t:'self',s:'mil',v:4,m:false}],sfx:[],ten:1,flv:'三邊安全框架重塑印太戰略格局，中國強烈抗議。'},
+  {id:'bp5',name:'民主援助基金',type:'a',dice:false,fx:[{t:'self',s:'dip',v:16,m:false},{t:'self',s:'soc',v:8,m:false}],sfx:[],ten:0,flv:'軟實力的投資，是最長期的戰略佈局。'},
+  {id:'bp6',name:'跨太平洋貿易協定',type:'a',dice:false,fx:[{t:'self',s:'eco',v:20,m:false}],sfx:[],ten:0,flv:'開放市場催動了亞太地區的經濟整合。'},
+  {id:'bp7',name:'綠色能源轉型',type:'f',dice:true,fx:[{t:'self',s:'eco',v:4,m:true},{t:'self',s:'soc',v:6,m:false}],sfx:[],ten:0,flv:'能源自主讓陣營擺脫對化石燃料的依賴。'},
+  {id:'bp8',name:'通貨膨脹危機',type:'c',dice:false,fx:[{t:'self',s:'eco',v:-10,m:false},{t:'self',s:'soc',v:-8,m:false}],sfx:[],ten:0,flv:'物價飆漲讓街頭民眾的不滿情緒達到沸點。'},
+  {id:'bp9',name:'產業回流政策',type:'f',dice:true,fx:[{t:'self',s:'eco',v:5,m:true},{t:'self',s:'mil',v:2,m:false}],sfx:[],ten:0,flv:'關鍵產業回流，強化了供應鏈的戰略韌性。'},
+  {id:'bp10',name:'人口老化衝擊',type:'c',dice:false,fx:[{t:'self',s:'eco',v:-8,m:false},{t:'self',s:'soc',v:-10,m:false}],sfx:[],ten:0,flv:'高齡化社會的代價，是生產力的緩慢流失。'},
+];
+const BLUE_DM=[
+  {id:'bd1',name:'越戰升級',type:'h',dice:true,fx:[{t:'self',s:'mil',v:6,m:true}],sfx:[{s:'eco',v:-12},{s:'soc',v:-8}],ten:2,flv:'戰場推進，國內街頭的抗議浪潮也隨之高漲。'},
+  {id:'bd2',name:'日美安保強化',type:'h',dice:true,fx:[{t:'self',s:'mil',v:5,m:true},{t:'self',s:'dip',v:4,m:false}],sfx:[],ten:0,flv:'前進基地的鞏固，確保了西太平洋的制海能力。'},
+  {id:'bd3',name:'第七艦隊戰略部署',type:'f',dice:true,fx:[{t:'self',s:'mil',v:7,m:true}],sfx:[{s:'dip',v:-5}],ten:1,flv:'炮艦政策從未真正退出歷史舞台。'},
+  {id:'bd4',name:'聯合軍事演習',type:'a',dice:false,fx:[{t:'self',s:'mil',v:14,m:false},{t:'self',s:'dip',v:5,m:false}],sfx:[],ten:1,flv:'協同演訓傳達了清晰的戰略威懾訊號。'},
+  {id:'bd5',name:'情報衛星網路',type:'f',dice:true,fx:[{t:'self',s:'mil',v:5,m:true}],sfx:[],ten:0,flv:'太空領域的優勢，直接轉化為戰場上的先機。'},
+  {id:'bd6',name:'外交斡旋成功',type:'a',dice:false,fx:[{t:'self',s:'dip',v:20,m:false}],sfx:[],ten:-1,flv:'談判桌上的一紙協議，勝過千軍萬馬。'},
+  {id:'bd7',name:'聯合國制裁決議',type:'f',dice:true,fx:[{t:'red',s:'dip',v:-8,m:false},{t:'self',s:'dip',v:5,m:true}],sfx:[],ten:1,flv:'多邊外交的力量，讓孤立成為可能。'},
+  {id:'bd8',name:'軍事醜聞爆發',type:'c',dice:false,fx:[{t:'self',s:'mil',v:-8,m:false},{t:'self',s:'dip',v:-6,m:false}],sfx:[],ten:0,flv:'醜聞讓陣營在盟邦眼中顏面盡失。'},
+  {id:'bd9',name:'印太戰略框架',type:'f',dice:true,fx:[{t:'self',s:'dip',v:5,m:true},{t:'self',s:'mil',v:3,m:false}],sfx:[],ten:0,flv:'跨越大洋的戰略想像，正在成為現實。'},
+  {id:'bd10',name:'朝鮮半島危機介入',type:'h',dice:true,fx:[{t:'self',s:'mil',v:4,m:true},{t:'self',s:'dip',v:3,m:false}],sfx:[],ten:1,flv:'危機就是機會，也是責任。'},
+];
+const RED_PM=[
+  {id:'rp1',name:'一帶一路倡議',type:'h',dice:true,fx:[{t:'self',s:'eco',v:6,m:true},{t:'self',s:'dip',v:4,m:false}],sfx:[],ten:0,flv:'基礎建設的輸出，是比炮艦更柔軟的力量。'},
+  {id:'rp2',name:'RCEP 生效',type:'h',dice:true,fx:[{t:'self',s:'eco',v:7,m:true}],sfx:[],ten:0,flv:'區域全面經濟夥伴關係協定重塑亞太貿易格局。'},
+  {id:'rp3',name:'數位人民幣推廣',type:'f',dice:true,fx:[{t:'self',s:'eco',v:4,m:true},{t:'self',s:'dip',v:3,m:false}],sfx:[],ten:0,flv:'去美元化的第一步，從數位貨幣開始。'},
+  {id:'rp4',name:'天安門事件衝擊',type:'h',dice:false,fx:[{t:'self',s:'soc',v:-15,m:false},{t:'self',s:'dip',v:-10,m:false}],sfx:[],ten:0,flv:'政治的代價，有時比經濟的損失更難彌補。'},
+  {id:'rp5',name:'國有企業改革',type:'a',dice:false,fx:[{t:'self',s:'eco',v:18,m:false}],sfx:[],ten:0,flv:'改革，是維持增長引擎的唯一方式。'},
+  {id:'rp6',name:'上合組織擴大',type:'f',dice:true,fx:[{t:'self',s:'dip',v:6,m:true}],sfx:[],ten:0,flv:'多邊框架讓孤立美國的戰略更有說服力。'},
+  {id:'rp7',name:'稀土出口管制',type:'f',dice:true,fx:[{t:'self',s:'eco',v:5,m:true},{t:'blue',s:'eco',v:-8,m:false}],sfx:[],ten:1,flv:'稀土是現代工業的維他命，也是地緣政治的籌碼。'},
+  {id:'rp8',name:'電動車產業崛起',type:'h',dice:true,fx:[{t:'self',s:'eco',v:6,m:true}],sfx:[],ten:0,flv:'製造業的轉型，正在改寫全球供應鏈的版圖。'},
+  {id:'rp9',name:'糧食安全危機',type:'c',dice:false,fx:[{t:'self',s:'eco',v:-8,m:false},{t:'self',s:'soc',v:-10,m:false}],sfx:[],ten:0,flv:'民以食為天——饑荒從未只是農業問題。'},
+  {id:'rp10',name:'文化大革命遺緒',type:'h',dice:false,fx:[{t:'self',s:'soc',v:-12,m:false},{t:'self',s:'eco',v:-8,m:false}],sfx:[],ten:0,flv:'歷史的傷痕，代代相傳。'},
+];
+const RED_DM=[
+  {id:'rd1',name:'南海軍事化',type:'h',dice:true,fx:[{t:'self',s:'mil',v:7,m:true}],sfx:[{s:'dip',v:-8}],ten:2,flv:'人工島礁的建設，讓南海成為內湖的夢想更進一步。'},
+  {id:'rd2',name:'朝鮮飛彈試射',type:'h',dice:true,fx:[{t:'self',s:'mil',v:5,m:true}],sfx:[{s:'dip',v:-6}],ten:2,flv:'每一次試射，都是給地區各國的一封恐嚇信。'},
+  {id:'rd3',name:'解放軍現代化',type:'h',dice:true,fx:[{t:'self',s:'mil',v:6,m:true}],sfx:[{s:'eco',v:-6}],ten:0,flv:'百年強軍夢，正在一步步成為現實。'},
+  {id:'rd4',name:'航母編隊演習',type:'a',dice:false,fx:[{t:'self',s:'mil',v:16,m:false}],sfx:[],ten:1,flv:'大洋上的鐵拳，傳遞無需翻譯的訊息。'},
+  {id:'rd5',name:'灰色地帶行動',type:'f',dice:true,fx:[{t:'self',s:'mil',v:5,m:true},{t:'blue',s:'dip',v:-5,m:false}],sfx:[],ten:1,flv:'不宣而戰，是削弱對手意志的最高藝術。'},
+  {id:'rd6',name:'心理戰與認知作戰',type:'f',dice:true,fx:[{t:'blue',s:'soc',v:-6,m:false},{t:'gold',s:'soc',v:-4,m:false},{t:'self',s:'dip',v:3,m:true}],sfx:[],ten:0,flv:'最有效的武器，往往不是槍炮，而是資訊。'},
+  {id:'rd7',name:'停火協議',type:'a',dice:false,fx:[{t:'self',s:'dip',v:14,m:false}],sfx:[],ten:-2,flv:'在有利局勢下叫停，也是一種戰略勝利。'},
+  {id:'rd8',name:'武器裝備落後',type:'c',dice:false,fx:[{t:'self',s:'mil',v:-10,m:false}],sfx:[],ten:0,flv:'再多的數量，也無法彌補關鍵技術的差距。'},
+  {id:'rd9',name:'俄烏衝突外溢效應',type:'h',dice:true,fx:[{t:'self',s:'mil',v:4,m:true}],sfx:[{s:'eco',v:-5}],ten:1,flv:'歐洲的戰火讓亞太各方重新評估軍備投入。'},
+  {id:'rd10',name:'上合軍演',type:'f',dice:true,fx:[{t:'self',s:'mil',v:4,m:true},{t:'self',s:'dip',v:3,m:false}],sfx:[],ten:0,flv:'多邊軍事合作強化了陸上戰略縱深。'},
+];
+const GOLD_PM=[
+  {id:'gp1',name:'亞洲四小龍崛起',type:'h',dice:true,fx:[{t:'self',s:'eco',v:7,m:true}],sfx:[{s:'mil',v:-5}],ten:0,flv:'把資源投入工廠，而非軍備——小國的生存之道。'},
+  {id:'gp2',name:'IMF 紓困計畫',type:'f',dice:true,fx:[{t:'self',s:'eco',v:8,m:true}],sfx:[{s:'soc',v:-8}],ten:0,flv:'紓困條款帶來資金，也帶來政治上的代價。'},
+  {id:'gp3',name:'接受大國援助',type:'f',dice:false,fx:[{t:'self',s:'eco',v:16,m:false},{t:'self',s:'dip',v:-5,m:false}],sfx:[],ten:0,flv:'沒有免費的午餐——每一筆援助都附帶條件。'},
+  {id:'gp4',name:'觀光業復甦',type:'f',dice:true,fx:[{t:'self',s:'eco',v:5,m:true},{t:'self',s:'soc',v:5,m:false}],sfx:[],ten:0,flv:'軟實力的輸出，從旅遊業開始。'},
+  {id:'gp5',name:'基礎建設投資',type:'a',dice:false,fx:[{t:'self',s:'eco',v:15,m:false},{t:'self',s:'soc',v:7,m:false}],sfx:[],ten:0,flv:'道路與橋樑，是發展的先決條件。'},
+  {id:'gp6',name:'民主轉型浪潮',type:'f',dice:true,fx:[{t:'self',s:'soc',v:8,m:false},{t:'self',s:'dip',v:4,m:true}],sfx:[],ten:0,flv:'制度改革，帶來不穩定，也帶來可能。'},
+  {id:'gp7',name:'政治腐敗醜聞',type:'c',dice:false,fx:[{t:'self',s:'soc',v:-12,m:false},{t:'self',s:'dip',v:-6,m:false}],sfx:[],ten:0,flv:'腐敗是小國最難根治的頑疾。'},
+  {id:'gp8',name:'自然災害衝擊',type:'c',dice:false,fx:[{t:'self',s:'eco',v:-10,m:false},{t:'self',s:'soc',v:-10,m:false}],sfx:[],ten:0,flv:'氣候危機在脆弱的國家身上留下最深的印記。'},
+  {id:'gp9',name:'數位經濟躍進',type:'f',dice:true,fx:[{t:'self',s:'eco',v:5,m:true},{t:'self',s:'soc',v:4,m:false}],sfx:[],ten:0,flv:'跨越傳統工業化，直接進入數位時代。'},
+  {id:'gp10',name:'勞動力出口策略',type:'f',dice:true,fx:[{t:'self',s:'eco',v:4,m:true}],sfx:[],ten:0,flv:'人是最重要的出口商品，也是最難保護的一種。'},
+];
+const GOLD_DM=[
+  {id:'gd1',name:'萬隆會議',type:'h',dice:true,fx:[{t:'self',s:'dip',v:8,m:true}],sfx:[],ten:0,flv:'亞非民族的集體發聲，讓世界不再只有兩個選擇。'},
+  {id:'gd2',name:'不結盟宣言',type:'h',dice:true,fx:[{t:'self',s:'dip',v:6,m:true}],sfx:[],ten:0,flv:'中立，不是軟弱，而是一種戰略選擇。'},
+  {id:'gd3',name:'調停大國衝突',type:'a',dice:false,fx:[{t:'self',s:'dip',v:22,m:false}],sfx:[],ten:-1,flv:'小國的聲音，在大國不願對話時，往往最被需要。'},
+  {id:'gd4',name:'區域安全論壇',type:'f',dice:true,fx:[{t:'self',s:'dip',v:7,m:true}],sfx:[],ten:-1,flv:'對話，是戰爭開始之前最後的機會。'},
+  {id:'gd5',name:'接受軍事保護',type:'f',dice:false,fx:[{t:'self',s:'mil',v:14,m:false},{t:'self',s:'dip',v:-8,m:false}],sfx:[],ten:0,flv:'安全保障從不免費，主權的代價悄悄算入帳單。'},
+  {id:'gd6',name:'參與聯合國維和',type:'f',dice:true,fx:[{t:'self',s:'dip',v:5,m:true},{t:'self',s:'mil',v:3,m:false}],sfx:[],ten:0,flv:'藍盔部隊，是道義的象徵，也是外交資本。'},
+  {id:'gd7',name:'邊境衝突爆發',type:'c',dice:false,fx:[{t:'self',s:'mil',v:-6,m:false},{t:'self',s:'eco',v:-5,m:false}],sfx:[],ten:1,flv:'地圖上一條不明確的線，成了流血的理由。'},
+  {id:'gd8',name:'軍事政變',type:'c',dice:false,fx:[{t:'self',s:'soc',v:-15,m:false},{t:'self',s:'dip',v:-8,m:false}],sfx:[],ten:0,flv:'槍口的邏輯，讓民主政治瞬間休眠。'},
+  {id:'gd9',name:'海岸防衛現代化',type:'f',dice:true,fx:[{t:'self',s:'mil',v:5,m:true}],sfx:[],ten:0,flv:'領海，是主權最後的底線。'},
+  {id:'gd10',name:'氣候外交峰會',type:'f',dice:true,fx:[{t:'self',s:'dip',v:6,m:true},{t:'self',s:'soc',v:4,m:false}],sfx:[],ten:0,flv:'氣候危機讓小島國有了大國從未有過的道德制高點。'},
+];
+const CRISIS_CARDS=[
+  {id:'cr1',name:'亞洲金融風暴',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-15,m:false},{t:'all',s:'soc',v:-10,m:false}],sfx:[],ten:1,flv:'貨幣崩潰的骨牌效應席捲整個地區，無一倖免。'},
+  {id:'cr2',name:'SARS 疫情爆發',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-10,m:false},{t:'all',s:'soc',v:-8,m:false}],sfx:[],ten:0,flv:'病毒不看護照，也不尊重國界。'},
+  {id:'cr3',name:'全球糧食危機',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-8,m:false},{t:'all',s:'soc',v:-6,m:false}],sfx:[],ten:0,flv:'饑荒從未只是農業問題，它永遠是政治問題。'},
+  {id:'cr4',name:'石油價格崩潰',type:'crisis',dice:false,fx:[{t:'red',s:'eco',v:-15,m:false},{t:'blue',s:'eco',v:6,m:false},{t:'gold',s:'eco',v:-5,m:false}],sfx:[],ten:0,flv:'能源市場的暴跌讓依賴石油的陣營陷入財政困境。'},
+  {id:'cr5',name:'海底電纜被切斷',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-6,m:false},{t:'all',s:'mil',v:-3,m:false}],sfx:[],ten:1,flv:'現代戰爭的序曲，往往從看不見的地方開始。'},
+  {id:'cr6',name:'超強颱風季節',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-7,m:false},{t:'all',s:'soc',v:-5,m:false}],sfx:[],ten:0,flv:'極端氣候不問立場，每個人都是受害者。'},
+  {id:'cr7',name:'全球半導體短缺',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-10,m:false}],sfx:[],ten:0,flv:'一顆晶片，擱置了整個工業文明的運轉。'},
+  {id:'cr8',name:'網路攻擊基礎設施',type:'crisis',dice:false,fx:[{t:'all',s:'eco',v:-6,m:false},{t:'all',s:'mil',v:-4,m:false}],sfx:[],ten:1,flv:'第五戰場沒有前線，每一台連網的電腦都是入口。'},
+  {id:'cr9',name:'難民潮衝擊',type:'crisis',dice:false,fx:[{t:'all',s:'soc',v:-8,m:false},{t:'all',s:'dip',v:-4,m:false}],sfx:[],ten:0,flv:'人道危機，在外交場合被冷靜地稱為「移民問題」。'},
+  {id:'cr10',name:'核電廠事故',type:'crisis',dice:false,fx:[{t:'all',s:'soc',v:-10,m:false},{t:'all',s:'eco',v:-5,m:false}],sfx:[],ten:0,flv:'科技的失控，喚起了全人類對核能的集體恐懼。'},
+];
+
+// ═══ NODE DATA ═══
+const NODE_INIT={
+  japan:      {name:'日本',     owner:'blue', bonuses:{eco:6,mil:4},        cx:520,cy:105,special:false},
+  taiwan:     {name:'台灣',     owner:'blue', bonuses:{eco:5,mil:4,dip:4},  cx:482,cy:168,special:true},
+  australia:  {name:'澳洲',     owner:'blue', bonuses:{eco:5,dip:3},        cx:500,cy:362,special:false},
+  southsea:   {name:'南海',     owner:'red',  bonuses:{mil:6},              cx:438,cy:248,special:false},
+  centralAsia:{name:'中亞',     owner:'red',  bonuses:{eco:5,dip:3},        cx:145,cy:78,special:false},
+  india:      {name:'印度',     owner:'gold', bonuses:{dip:5,eco:4},        cx:215,cy:218,special:false},
+  asean:      {name:'東協',     owner:'gold', bonuses:{dip:5,eco:3},        cx:375,cy:288,special:false},
+  korea:      {name:'朝鮮',     owner:null,   bonuses:{mil:5,dip:3},        cx:484,cy:110,special:false},
+  malacca:    {name:'麻六甲',   owner:null,   bonuses:{eco:8},              cx:340,cy:318,special:false},
+  pacific:    {name:'太平洋',   owner:null,   bonuses:{mil:5},              cx:582,cy:215,special:false},
+};
+
+// ═══ STATE ═══
+let G;
+const DECKS={blue:{pm:BLUE_PM,dm:BLUE_DM},red:{pm:RED_PM,dm:RED_DM},gold:{pm:GOLD_PM,dm:GOLD_DM}};
+
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v))}
+function getDiceMult(r){return r<=2?1:r<=4?2:r===5?3:4}
+function fc(id){return id==='blue'?'#3a7bd5':id==='red'?'#c94040':'#c9a84c'}
+function fn(id){if(!id)return '未控制';return G?.factions[id]?.name||id}
+function activeFid(){return G.order[G.turnIdx]}
+function activeF(){return G.factions[activeFid()]}
+function stat_lbl(s){return {eco:'💰',mil:'⚔',dip:'🤝',soc:'🏛'}[s]||s}
+
+function initGame(){
+  G={
+    round:1,maxRounds:20,order:['blue','red','gold'],turnIdx:0,
+    phase:'select',tension:2,crisisTimer:3,
+    winner:null,ending:null,log:[],
+    pendingEffects:[],actionDone:false,selAction:null,
+    selPM:null,selDM:null,diceRoll:null,diceMult:null,
+    factions:{
+      blue:mkF('blue','自由陣營'),
+      red: mkF('red','東方陣營'),
+      gold:mkF('gold','中立陣營'),
+    },
+    nodes:JSON.parse(JSON.stringify(NODE_INIT)),
+    crisisDeck:shuffle([...CRISIS_CARDS]),
+  };
+  ['blue','red','gold'].forEach(f=>{
+    G.factions[f].pmDeck=shuffle([...DECKS[f].pm]);
+    G.factions[f].dmDeck=shuffle([...DECKS[f].dm]);
+  });
+  doDraw();
+  log('遊戲開始！亞太局勢一觸即發。');
+  render();
+}
+
+function mkF(id,name){
+  return {id,name,eco:30,mil:30,dip:30,soc:100,
+    pmHand:[],dmHand:[],pmDrawn:null,dmDrawn:null,
+    pmDeck:[],dmDeck:[],tradePacts:[],milPact:null,
+    collapsed:false,collapseLeft:0};
+}
+
+function log(msg){G.log.unshift(`[R${G.round}] ${msg}`);if(G.log.length>25)G.log.pop()}
+
+// ═══ CORE LOGIC ═══
+function setStat(fid,s,delta){
+  const f=G.factions[fid];
+  f[s]=Math.max(0,f[s]+delta);
+  if(s==='soc')f[s]=Math.min(100,f[s]);
+  if(s==='soc'&&f[s]<=0&&!f.collapsed)doCollapse(fid);
+}
+
+function doCollapse(fid){
+  const f=G.factions[fid];
+  f.collapsed=true;f.collapseLeft=2;
+  f.tradePacts=[];f.milPact=null;
+  Object.values(G.factions).forEach(o=>{ o.tradePacts=o.tradePacts.filter(x=>x!==fid); });
+  log(`⚠️ ${f.name} 政權崩潰！停止行動 2 回合。`);
+  const col=Object.values(G.factions).filter(f=>f.collapsed);
+  if(col.length>=2){
+    if(!G.factions.gold.collapsed) endGame('gold','混亂結局','其他兩陣營相繼崩潰，中立陣營以倖存者姿態取得勝利。');
+    else endGame(null,'混亂結局','三大陣營均陷入崩潰，亞太秩序全面瓦解。本局平局。');
+  }
+}
+
+function resolveCard(card,fid,mult){
+  const effs=[];
+  card.fx.forEach(eff=>{
+    const targets=eff.t==='all'?['blue','red','gold']:eff.t==='self'?[fid]:[eff.t];
+    const val=eff.m?eff.v*mult:eff.v;
+    targets.forEach(tid=>{
+      setStat(tid,eff.s,val);
+      effs.push({fid:tid,s:eff.s,v:val});
+    });
+  });
+  (card.sfx||[]).forEach(sfx=>{
+    setStat(fid,sfx.s,sfx.v);
+    effs.push({fid,s:sfx.s,v:sfx.v,side:true});
+  });
+  if(card.ten){G.tension=clamp(G.tension+card.ten,0,10);effs.push({ten:card.ten});}
+  return effs;
+}
+
+function collectNodeBonus(fid){
+  const f=G.factions[fid];
+  let lines=[];
+  Object.entries(G.nodes).forEach(([nid,n])=>{
+    if(n.owner===fid){
+      Object.entries(n.bonuses).forEach(([s,v])=>{
+        setStat(fid,s,v);
+        lines.push(`${n.name}→${s.toUpperCase()}+${v}`);
+      });
+    }
+  });
+  f.tradePacts.forEach(pid=>{
+    setStat(fid,'eco',8);
+    lines.push(`貿易(${fn(pid)})→ECO+8`);
+  });
+  if(lines.length) log(`${f.name} 節點收益：${lines.join('，')}`);
+}
+
+function execAction(aId,target){
+  const fid=activeFid();const f=G.factions[fid];
+  if(aId==='aid'){
+    if(f.eco<10){alert('經濟點數不足（需 10）');return false}
+    setStat(fid,'eco',-10);setStat(target,'eco',10);
+    log(`${f.name} 援助 ${fn(target)} ECO+10`);
+  } else if(aId==='trade'){
+    if(!f.tradePacts.includes(target)){
+      f.tradePacts.push(target);G.factions[target].tradePacts.push(fid);
+      G.tension=clamp(G.tension-1,0,10);
+      log(`${f.name} 與 ${fn(target)} 達成貿易協定（每回合各 ECO+8，緊張值-1）`);
+    }
+  } else if(aId==='sanction'){
+    if(f.dip<10){alert('外交點數不足（需 10）');return false}
+    setStat(fid,'dip',-10);
+    const val=f.dip>=G.factions[target].dip?-15:-8;
+    setStat(target,'eco',val);G.tension=clamp(G.tension+1,0,10);
+    log(`${f.name} 制裁 ${fn(target)} ECO${val}，緊張值+1`);
+  } else if(aId==='milpact'){
+    if(f.dip<15){alert('外交點數不足（需 15）');return false}
+    setStat(fid,'dip',-15);f.milPact=target;
+    G.tension=clamp(G.tension-1,0,10);
+    log(`${f.name} 與 ${fn(target)} 締結軍事同盟，緊張值-1`);
+  } else if(aId==='intel'){
+    if(f.mil<10){alert('軍事點數不足（需 10）');return false}
+    const tf=G.factions[target];
+    if(f.mil<=tf.mil){alert('軍事值需高於目標陣營');return false}
+    setStat(fid,'mil',-10);
+    const hand=[...tf.pmHand,...tf.dmHand].filter(Boolean);
+    if(hand.length>0){
+      const stolen=hand[Math.floor(Math.random()*hand.length)];
+      tf.pmHand=tf.pmHand.filter(c=>c.id!==stolen.id);
+      tf.dmHand=tf.dmHand.filter(c=>c.id!==stolen.id);
+      if(f.pmHand.length<1)f.pmHand.push(stolen);
+      log(`${f.name} 從 ${fn(target)} 竊取：「${stolen.name}」，緊張值+1`);
+    } else {
+      log(`${f.name} 嘗試情報戰，但 ${fn(target)} 無可竊取的手牌。`);
+    }
+    G.tension=clamp(G.tension+1,0,10);
+  } else if(aId==='media'){
+    if(f.dip<12){alert('外交點數不足（需 12）');return false}
+    setStat(fid,'dip',-12);setStat(target,'soc',-10);
+    log(`${f.name} 媒體攻勢 → ${fn(target)} SOC-10`);
+  } else if(aId==='discard'){
+    f.pmHand=[];f.dmHand=[];
+    ensureDeck(fid,'pm');ensureDeck(fid,'dm');
+    const np=f.pmDeck.shift();const nd=f.dmDeck.shift();
+    if(np)f.pmHand.push(np);if(nd)f.dmHand.push(nd);
+    log(`${f.name} 弃牌刷新手牌`);
+  } else if(aId==='node'){
+    if(f.dip<20){alert('外交點數不足（需 20）');return false}
+    setStat(fid,'dip',-20);
+    const n=G.nodes[target];const prev=n.owner;
+    n.owner=fid;
+    if(target==='taiwan'&&prev!==fid){
+      G.tension=clamp(G.tension+2,0,10);
+      log(`⚡ ${f.name} 取得台灣節點！緊張值+2`);
+    } else {
+      log(`${f.name} 取得 ${n.name} 節點控制（DIP-20）`);
+    }
+  }
+  G.actionDone=true;
+  checkVictory();
+  return true;
+}
+
+function checkVictory(){
+  if(G.winner)return;
+  const ids=['blue','red','gold'];
+  for(const fid of ids){
+    const f=G.factions[fid];
+    const others=ids.filter(x=>x!==fid).map(x=>G.factions[x]);
+    const tot=f.eco+f.mil+f.dip+f.soc;
+    const ot=others.reduce((s,o)=>s+o.eco+o.mil+o.dip+o.soc,0);
+    if(tot>=400&&ot<200){endGame(fid,'霸權結局（Hegemony）',`${f.name}四項點數總和 ${Math.round(tot)}，確立亞太霸主地位！`);return;}
+    if(f.eco>=200&&others.every(o=>o.eco<80)){endGame(fid,'經濟霸主',`${f.name}以 ECO ${Math.round(f.eco)} 主宰亞太供應鏈！`);return;}
+    const pacts=(f.tradePacts?.length||0)+(f.milPact?1:0);
+    if(pacts>=5&&f.dip>=150){endGame(fid,'外交勝利',`${f.name}廣結盟邦（${pacts}份協定），主導多邊秩序！`);return;}
+  }
+  if(G.round>G.maxRounds){
+    const ranked=ids.map(f=>({id:f,t:G.factions[f].eco+G.factions[f].mil+G.factions[f].dip+G.factions[f].soc})).sort((a,b)=>b.t-a.t);
+    const win=ranked[0];
+    endGame(win.id,'時限結局（20回合）',`${G.factions[win.id].name}以總點數 ${Math.round(win.t)} 勝出！`);
+  }
+}
+
+function processHotWar(){
+  if(G.tension<10)return;
+  const ids=['blue','red','gold'].filter(f=>!G.factions[f].collapsed);
+  if(ids.length<2)return;
+  ids.forEach(fid=>{setStat(fid,'eco',-5);setStat(fid,'soc',-3);});
+  const ranked=ids.sort((a,b)=>G.factions[b].mil-G.factions[a].mil);
+  const str=ranked[0],wk=ranked[ranked.length-1];
+  if(G.factions[str].mil-G.factions[wk].mil>=50){
+    setStat(wk,'soc',-5);
+    log(`⚔️ 熱戰：${G.factions[wk].name}軍事劣勢遭額外損傷`);
+    if(G.factions[wk].soc<=0&&G.factions[str].mil>=250)
+      endGame(str,'軍事制霸（Military Conquest）',`${G.factions[str].name}以壓倒性武力擊潰敵方！`);
+  } else {
+    log('⚔️ 熱戰持續！全陣營承受戰爭消耗（ECO-5, SOC-3）');
+  }
+  checkVictory();
+}
+
+function endGame(wid,type,desc){
+  if(G.winner!==null&&G.winner!==undefined)return;
+  G.winner=wid||'draw';G.ending={type,desc};
+  log(`🏆 ${type}`);render();
+}
+
+function ensureDeck(fid,role){
+  const f=G.factions[fid];
+  const dk=role+'Deck';
+  if(f[dk].length===0){
+    f[dk]=shuffle([...DECKS[fid][role]]);
+    log(`${f.name} ${role==='pm'?'總理':'國防'}牌組補充重洗`);
+  }
+}
+
+function doDraw(){
+  const fid=activeFid();const f=G.factions[fid];
+  ensureDeck(fid,'pm');ensureDeck(fid,'dm');
+  f.pmDrawn=f.pmDeck.shift();
+  f.dmDrawn=f.dmDeck.shift();
+}
+
+function advanceTurn(){
+  G.turnIdx=(G.turnIdx+1)%3;
+  if(G.turnIdx===0){
+    G.round++;
+    G.crisisTimer--;
+    if(G.crisisTimer<=0){G.crisisTimer=3;triggerCrisis();}
+    processHotWar();
+    checkVictory();
+    if(G.winner)return;
+  }
+  if(G.round>G.maxRounds){checkVictory();if(G.winner)return;}
+  startNextTurn();
+}
+
+function startNextTurn(){
+  const fid=activeFid();const f=G.factions[fid];
+  G.selPM=null;G.selDM=null;G.diceRoll=null;G.diceMult=null;
+  G.pendingEffects=[];G.actionDone=false;G.selAction=null;G.phase='select';
+  if(f.collapsed){
+    f.collapseLeft--;
+    if(f.collapseLeft<=0){
+      f.collapsed=false;f.soc=20;
+      log(`${f.name}從崩潰中恢復，以 SOC 20 重啟`);
+    } else {
+      log(`${f.name}崩潰中（剩 ${f.collapseLeft} 回合），跳過`);
+      advanceTurn();return;
+    }
+  }
+  doDraw();
+  log(`${f.name} 開始行動（第 ${G.round} 回合）`);
+  render();
+}
+
+function triggerCrisis(){
+  if(G.crisisDeck.length===0)G.crisisDeck=shuffle([...CRISIS_CARDS]);
+  const c=G.crisisDeck.shift();
+  log(`🚨 全球危機：${c.name}`);
+  resolveCard(c,'all',1);
+  log(c.flv);
+  checkVictory();
+}
+
+function applyResolution(){
+  const fid=activeFid();const mult=G.diceMult||1;
+  G.pendingEffects=[];
+  if(G.selPM){
+    const effs=resolveCard(G.selPM,fid,mult);
+    G.pendingEffects.push(...effs);
+    log(`${G.factions[fid].name} 打出「${G.selPM.name}」${G.selPM.dice?`(骰${G.diceRoll}×${mult})`:''}`)
+  }
+  if(G.selDM){
+    const effs=resolveCard(G.selDM,fid,mult);
+    G.pendingEffects.push(...effs);
+    if(!G.selPM) log(`${G.factions[fid].name} 打出「${G.selDM.name}」${G.selDM.dice?`(骰${G.diceRoll}×${mult})`:''}`)
+    else log(`→ 國防部長打出「${G.selDM.name}」`);
+  }
+  checkVictory();
+}
+
+// ═══ RENDER ═══
+function render(){
+  const app=document.getElementById('app');
+  if(!G){app.innerHTML='<div style="padding:40px">載入中...</div>';return;}
+  if(G.winner){app.innerHTML=renderVictory();return;}
+  app.innerHTML=`
+    <div class="hdr">${renderHdr()}</div>
+    <div class="main">
+      <div class="map-col">${renderMap()}</div>
+      <div class="center-col">${renderCenter()}</div>
+      <div class="stats-col">${renderStats()}</div>
+    </div>`;
+  // attach select listener
+}
+
+function renderHdr(){
+  const fid=activeFid();const col=fc(fid);
+  const tp=(G.tension/10)*100;
+  const tc=G.tension>=10?'#c94040':G.tension>=8?'#c9a84c':'#3a7bd5';
+  const tl=G.tension>=10?'熱戰':G.tension>=8?'冷戰':'和平';
+  return `<span class="logo">APAC: BALANCE OF POWER</span>
+    <span class="rnd">第 ${G.round}/${G.maxRounds} 回合</span>
+    <div class="ten-wrap">
+      <span class="ten-lbl">緊張值 ${tl}</span>
+      <div class="ten-bar"><div class="ten-fill" style="width:${tp}%;background:${tc}"></div></div>
+      <span class="ten-val" style="color:${tc}">${G.tension}</span>
+    </div>
+    <div class="act-badge" style="color:${col};border-color:${col}">▶ ${G.factions[fid].name}</div>`;
+}
+
+function renderMap(){
+  const conns=[['japan','taiwan'],['japan','korea'],['taiwan','southsea'],['southsea','asean'],
+    ['asean','malacca'],['asean','india'],['india','centralAsia'],['australia','pacific'],
+    ['pacific','japan'],['malacca','australia'],['southsea','pacific'],['korea','southsea']];
+  const N=G.nodes;
+  const lines=conns.map(([a,b])=>{
+    const na=N[a],nb=N[b];if(!na||!nb)return'';
+    return `<line x1="${na.cx}" y1="${na.cy}" x2="${nb.cx}" y2="${nb.cy}" stroke="#1a2232" stroke-width="1" stroke-dasharray="3 5"/>`;
+  }).join('');
+
+  const nds=Object.entries(N).map(([id,n])=>{
+    const oc=n.owner?fc(n.owner):'#3a4050';
+    const sc=n.owner?fc(n.owner):'#5a6070';
+    const bstr=Object.entries(n.bonuses).map(([s,v])=>`${s.toUpperCase()}+${v}`).join(' ');
+    const special=n.special?`<circle cx="${n.cx}" cy="${n.cy}" r="19" fill="none" stroke="${oc}" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.5"/>`:'';
+    return `<g onclick="handleNodeClick('${id}')" style="cursor:pointer">
+      ${special}
+      <circle cx="${n.cx}" cy="${n.cy}" r="13" fill="${n.owner?oc:'#1a2232'}" opacity="${n.owner?'.3':'.5'}" stroke="${sc}" stroke-width="${n.owner?'1.5':'1'}"/>
+      <circle cx="${n.cx}" cy="${n.cy}" r="7" fill="${n.owner?oc:'#2a3040'}" opacity="${n.owner?'.85':'1'}"/>
+      <text x="${n.cx}" y="${n.cy+25}" text-anchor="middle" fill="#7a8090" font-size="9" font-family="Noto Sans TC,sans-serif">${n.name}</text>
+      <text x="${n.cx}" y="${n.cy+35}" text-anchor="middle" fill="#2e3545" font-size="7" font-family="Space Mono,monospace">${bstr}</text>
+    </g>`;
+  }).join('');
+
+  return `<svg width="100%" height="100%" viewBox="0 0 640 420" style="background:#090c12">
+    <rect width="640" height="420" fill="#090c12"/>
+    <line x1="0" y1="140" x2="640" y2="140" stroke="#0d1018" stroke-width="0.5"/>
+    <line x1="0" y1="280" x2="640" y2="280" stroke="#0d1018" stroke-width="0.5"/>
+    <line x1="213" y1="0" x2="213" y2="420" stroke="#0d1018" stroke-width="0.5"/>
+    <line x1="426" y1="0" x2="426" y2="420" stroke="#0d1018" stroke-width="0.5"/>
+    <path d="M35,25 Q170,16 290,28 Q385,28 450,50 Q475,66 472,100 Q465,128 440,142 Q410,155 382,172 Q348,192 318,218 Q290,244 272,268 Q255,282 235,272 Q212,252 188,234 Q162,220 138,230 Q118,244 108,265 Q90,255 75,228 Q58,196 45,160 Q38,124 36,72 Z" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <path d="M138,230 Q160,218 178,232 Q194,248 196,282 Q192,320 178,348 Q164,366 150,356 Q132,334 122,300 Q112,274 120,250 Z" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <path d="M250,280 Q272,268 282,282 Q278,305 264,314 Q248,306 246,292 Z" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <ellipse cx="322" cy="298" rx="34" ry="20" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <ellipse cx="408" cy="228" rx="11" ry="17" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <path d="M432,78 Q468,65 492,80 Q498,96 488,110 Q468,118 448,114 Q430,108 426,94 Z" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <ellipse cx="474" cy="168" rx="7" ry="12" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    <path d="M400,332 Q488,320 554,342 Q574,360 568,398 Q556,420 524,428 Q484,436 444,424 Q408,410 392,382 Q382,358 400,342 Z" fill="#151e2c" stroke="#1e2a3a" stroke-width="0.8"/>
+    ${lines}${nds}
+    <rect x="8" y="400" width="7" height="7" fill="#3a7bd5" rx="1"/><text x="18" y="408" fill="#3a4050" font-size="8" font-family="Space Mono,monospace">自由</text>
+    <rect x="48" y="400" width="7" height="7" fill="#c94040" rx="1"/><text x="58" y="408" fill="#3a4050" font-size="8" font-family="Space Mono,monospace">東方</text>
+    <rect x="88" y="400" width="7" height="7" fill="#c9a84c" rx="1"/><text x="98" y="408" fill="#3a4050" font-size="8" font-family="Space Mono,monospace">中立</text>
+    <rect x="128" y="400" width="7" height="7" fill="#2a3040" rx="1" stroke="#5a6070" stroke-width="0.5"/><text x="138" y="408" fill="#3a4050" font-size="8" font-family="Space Mono,monospace">未控</text>
+  </svg>`;
+}
+
+function renderStats(){
+  return ['blue','red','gold'].map(fid=>{
+    const f=G.factions[fid];const col=fc(fid);
+    const ownedNodes=Object.entries(G.nodes).filter(([,n])=>n.owner===fid).map(([,n])=>n.name);
+    const badges=[];
+    if(f.collapsed)badges.push(`<span class="sbadge sb-col">崩潰</span>`);
+    if(f.tradePacts.length)badges.push(`<span class="sbadge sb-tr">貿易×${f.tradePacts.length}</span>`);
+    if(G.tension>=10)badges.push(`<span class="sbadge sb-war">熱戰</span>`);
+    return `<div class="fsc" style="border-top-color:${col}">
+      <div class="fsc-name" style="color:${col}">${f.name} ${badges.join('')}</div>
+      <div class="stat-row"><span class="stat-lbl">💰 經濟</span><span class="stat-v" style="color:#5bab7c">${Math.round(f.eco)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">⚔ 軍事</span><span class="stat-v" style="color:#d97070">${Math.round(f.mil)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">🤝 外交</span><span class="stat-v" style="color:#3a7bd5">${Math.round(f.dip)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">🏛 穩定</span><span class="stat-v" style="color:#9b73cc">${Math.round(f.soc)}</span></div>
+      <div class="soc-bar"><div class="soc-fill" style="width:${f.soc}%"></div></div>
+      ${ownedNodes.length?`<div class="node-mini">${ownedNodes.map(n=>`<span class="ntag" style="color:${col};border-color:${col}">${n}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('')+`<div class="glog">${G.log.slice(0,10).map(e=>`<div class="le">${e}</div>`).join('')}</div>`;
+}
+
+function renderCard(card,role,selected,played){
+  const fid=activeFid();const col=fc(fid);
+  const tlabels={h:'歷史',f:'自訂',a:'行動',c:'危機',crisis:'危機'};
+  const tcolors={h:'#6b9adf',f:'#9b73cc',a:'#5bab7c',c:'#d97070',crisis:'#d97070'};
+  const rl=role==='pm'?'總理':'國防';
+  const effsH=card.fx.map(e=>{
+    const tl=e.t==='self'?'己方':e.t==='all'?'全陣':fn(e.t);
+    const sl=stat_lbl(e.s);const sign=e.v>0?'+':'';
+    const ml=e.m?' ×骰':'（固）';
+    return `<div class="ceff${e.v<0?' neg':''}">${tl} ${sl}${sign}${e.v}${ml}</div>`;
+  }).join('');
+  const sfxH=(card.sfx||[]).map(s=>{
+    return `<div class="ceff neg">${stat_lbl(s.s)}${s.v}（副作用）</div>`;
+  }).join('');
+  const cls=`gcard${selected?' sel':''}${played?' played':''}`;
+  const onclick=played?'':`onclick="handleCardSel('${role}','${card.id}')"`;
+  return `<div class="${cls}" ${onclick} style="${selected?`border-color:${col}`:''}">
+    <div class="ctag" style="color:${tcolors[card.type]}">${rl} · ${tlabels[card.type]}</div>
+    <div class="cname">${card.name}</div>
+    ${effsH}${sfxH}
+    ${card.flv?`<div class="cflv">${card.flv}</div>`:''}
+  </div>`;
+}
+
+function renderCenter(){
+  const fid=activeFid();const f=G.factions[fid];const col=fc(fid);
+  if(G.phase==='select') return renderSelectPhase(fid,f,col);
+  if(G.phase==='resolve') return renderResolvePhase(fid,f,col);
+  if(G.phase==='action') return renderActionPhase(fid,f,col);
+  return '';
+}
+
+function renderSelectPhase(fid,f,col){
+  const pmCards=[...f.pmHand,f.pmDrawn].filter(Boolean);
+  const dmCards=[...f.dmHand,f.dmDrawn].filter(Boolean);
+  const pmH=pmCards.map(c=>renderCard(c,'pm',G.selPM?.id===c.id,false)).join('');
+  const dmH=dmCards.map(c=>renderCard(c,'dm',G.selDM?.id===c.id,false)).join('');
+  const canGo=G.selPM||G.selDM;
+  return `<div class="ptitle" style="color:${col}">▶ 選牌階段 — ${f.name}</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:10px">選擇要打出的牌（PM 和 DM 各選最多 1 張，未選的牌留存手牌下回合使用）</div>
+    <div class="div-lbl">總理牌組（PM）</div>
+    <div class="cards-row">${pmH||'<span style="color:var(--dim);font-size:11px">無可用牌</span>'}</div>
+    <div class="div-lbl" style="margin-top:12px">國防部長牌組（DM）</div>
+    <div class="cards-row">${dmH||'<span style="color:var(--dim);font-size:11px">無可用牌</span>'}</div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-b" ${!canGo?'disabled':''} onclick="handleGoResolve()">結算選中的牌 →</button>
+      <button class="btn" onclick="handleSkipToAction()">跳過出牌（直接行動）</button>
+    </div>`;
+}
+
+function renderResolvePhase(fid,f,col){
+  const needDice=(G.selPM?.dice)||(G.selDM?.dice);
+  const rolled=G.diceRoll!==null;
+  const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+  const pmH=G.selPM?renderCard(G.selPM,'pm',false,true):'';
+  const dmH=G.selDM?renderCard(G.selDM,'dm',false,true):'';
+  const effH=G.pendingEffects.length?`<div class="elog">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:5px">結算結果</div>
+    ${G.pendingEffects.map(e=>{
+      if(e.ten) return `<div>緊張值 <span class="${e.ten>0?'el-minus':'el-plus'}">${e.ten>0?'+':''}${e.ten}</span></div>`;
+      const fn2=G.factions[e.fid]?.name||e.fid;
+      const sign=e.v>0?'+':'';
+      const cls=e.v>0?'el-plus':'el-minus';
+      return `<div>${fn2} ${stat_lbl(e.s)} <span class="${cls}">${sign}${Math.round(e.v)}</span>${e.side?' (副作用)':''}</div>`;
+    }).join('')}
+  </div>`:'';
+  return `<div class="ptitle" style="color:${col}">▶ 結算階段 — ${f.name}</div>
+    <div class="cards-row" style="margin-bottom:12px">${pmH}${dmH}</div>
+    ${needDice&&!rolled?`<div class="dice-box" style="margin-bottom:12px">
+      <span class="dface" id="dface">🎲</span>
+      <div style="font-size:11px;color:var(--dim);margin:6px 0">點擊擲骰決定事件倍數</div>
+      <button class="btn btn-g" onclick="handleRoll()">擲骰！</button>
+    </div>`:''}
+    ${rolled&&needDice?`<div class="dice-box" style="margin-bottom:12px">
+      <span class="dface">${faces[G.diceRoll-1]}</span>
+      <div class="dmult">× ${G.diceMult}</div>
+    </div>`:''}
+    ${effH}
+    ${rolled||!needDice?`<button class="btn btn-b" onclick="handleConfirmResolve()">確認結算，進入行動階段 →</button>`:''}`;
+}
+
+function renderActionPhase(fid,f,col){
+  const others=['blue','red','gold'].filter(x=>x!==fid);
+  const fOpts=others.map(x=>`<option value="${x}">${G.factions[x].name}</option>`).join('');
+  const nOpts=Object.entries(G.nodes).filter(([,n])=>n.owner!==fid)
+    .map(([id,n])=>`<option value="${id}">${n.name}（${fn(n.owner)}）</option>`).join('');
+  const actions=[
+    {id:'aid',    t:'援助（Aid）',       c:'消耗 ECO -10',    d:'轉移 ECO +10 給目標陣營',hasTarget:'faction'},
+    {id:'trade',  t:'貿易協定',          c:'免費',            d:'雙方每回合 ECO +8，緊張值-1',hasTarget:'faction'},
+    {id:'sanction',t:'制裁（Sanction）', c:'消耗 DIP -10',    d:'目標 ECO -15，緊張值+1',hasTarget:'faction'},
+    {id:'milpact',t:'軍事同盟',          c:'消耗 DIP -15',    d:'合併計算軍事點數，緊張值-1',hasTarget:'faction'},
+    {id:'intel',  t:'情報戰',            c:'消耗 MIL -10',    d:'竊取對手手牌，緊張值+1',hasTarget:'faction'},
+    {id:'media',  t:'媒體攻勢',          c:'消耗 DIP -12',    d:'目標陣營 SOC -10',hasTarget:'faction'},
+    {id:'discard',t:'弃牌（Discard）',   c:'免費',            d:'清空手牌重新抽牌',hasTarget:null},
+    {id:'node',   t:'外交爭奪節點',      c:'消耗 DIP -20',    d:'取得地圖節點控制',hasTarget:'node'},
+  ];
+  const done=G.actionDone;
+  const aHTML=actions.map(a=>`
+    <div class="abtn" ${done?'disabled':''} onclick="handleActSel('${a.id}')">
+      <div class="atitle" style="${G.selAction===a.id?`color:var(--accent)`:''}">${a.t}</div>
+      <div class="acost">${a.c}</div>
+      <div class="adesc">${a.d}</div>
+    </div>`).join('');
+  const selA=actions.find(a=>a.id===G.selAction);
+  const targetUI=G.selAction&&selA&&!done?`
+    <div class="panel" style="margin-top:8px">
+      <div class="ptitle">選擇目標</div>
+      ${selA.hasTarget==='faction'?`<select id="tsel" style="margin-bottom:8px">${fOpts}</select>`:
+        selA.hasTarget==='node'?`<select id="tsel" style="margin-bottom:8px">${nOpts}</select>`:
+        '<div style="color:var(--dim);font-size:11px;margin-bottom:8px">無需選擇目標</div>'}
+      <button class="btn btn-g" onclick="handleConfirmAction()">確認執行</button>
+    </div>`:
+    (G.selAction&&!selA?.hasTarget&&!done)?`<div style="margin-top:8px"><button class="btn btn-g" onclick="handleConfirmAction()">確認執行 ${selA?.t}</button></div>`:'';
+  return `<div class="ptitle" style="color:${col}">▶ 陣營行動 — ${f.name}</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:10px">${done?'✓ 本回合行動已完成':'選擇一種行動，或跳過'}</div>
+    <div class="agrid">${aHTML}</div>
+    ${targetUI}
+    <div class="btn-row" style="margin-top:12px">
+      ${!done?`<button class="btn" onclick="handleSkipAction()">跳過行動</button>`:''}
+      <button class="btn btn-b" onclick="handleEndTurn()">結束回合 →</button>
+    </div>`;
+}
+
+function renderVictory(){
+  const wid=G.winner==='draw'?null:G.winner;
+  const wname=wid?G.factions[wid].name:'無人（平局）';
+  const wcol=wid?fc(wid):'#888780';
+  const stats=['blue','red','gold'].map(fid=>{
+    const f=G.factions[fid];const col=fc(fid);
+    const t=Math.round(f.eco+f.mil+f.dip+f.soc);
+    return `<div class="v-card" style="border-top-color:${col}">
+      <div style="font-family:var(--mono);font-size:10px;color:${col};font-weight:700;margin-bottom:6px">${f.name}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--dim)">
+        💰${Math.round(f.eco)} ⚔${Math.round(f.mil)} 🤝${Math.round(f.dip)} 🏛${Math.round(f.soc)}
+      </div>
+      <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent);margin-top:6px">${t}</div>
+    </div>`;
+  }).join('');
+  return `<div style="padding:40px;overflow-y:auto;max-height:100vh">
+    <div class="victory">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim);margin-bottom:12px">GAME OVER</div>
+      <div class="v-title" style="color:${wcol}">${G.ending?.type}</div>
+      <div style="font-size:15px;color:var(--text);margin-bottom:8px">${wname} 獲勝</div>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:24px">${G.ending?.desc}</div>
+      <div class="v-grid">${stats}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:16px">對局歷程</div>
+      <div class="glog" style="text-align:left;max-height:200px;margin-bottom:24px">${G.log.map(e=>`<div class="le">${e}</div>`).join('')}</div>
+      <button class="btn btn-b" onclick="initGame()" style="padding:10px 28px;font-size:12px">重新開始遊戲</button>
+    </div>
+  </div>`;
+}
+
+// ═══ HANDLERS ═══
+function handleCardSel(role,cardId){
+  const fid=activeFid();const f=G.factions[fid];
+  if(role==='pm'){
+    const all=[...f.pmHand,f.pmDrawn].filter(Boolean);
+    const c=all.find(x=>x.id===cardId);
+    G.selPM=G.selPM?.id===cardId?null:c;
+  } else {
+    const all=[...f.dmHand,f.dmDrawn].filter(Boolean);
+    const c=all.find(x=>x.id===cardId);
+    G.selDM=G.selDM?.id===cardId?null:c;
+  }
+  render();
+}
+
+function handleGoResolve(){
+  if(!G.selPM&&!G.selDM)return;
+  G.phase='resolve';
+  const needDice=(G.selPM?.dice)||(G.selDM?.dice);
+  if(!needDice){
+    G.diceRoll=1;G.diceMult=1;
+    applyResolution();
+  }
+  render();
+}
+
+function handleSkipToAction(){
+  const fid=activeFid();const f=G.factions[fid];
+  if(f.pmDrawn&&f.pmHand.length<1)f.pmHand.push(f.pmDrawn);
+  if(f.dmDrawn&&f.dmHand.length<1)f.dmHand.push(f.dmDrawn);
+  f.pmDrawn=null;f.dmDrawn=null;
+  G.phase='action';render();
+}
+
+function handleRoll(){
+  const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+  const finalRoll=Math.floor(Math.random()*6)+1;
+  const face=document.getElementById('dface');
+  if(!face){
+    G.diceRoll=finalRoll;G.diceMult=getDiceMult(finalRoll);
+    applyResolution();render();return;
+  }
+  let count=0;
+  const anim=setInterval(()=>{
+    face.textContent=faces[Math.floor(Math.random()*6)];
+    count++;
+    if(count>=10){
+      clearInterval(anim);
+      face.textContent=faces[finalRoll-1];
+      G.diceRoll=finalRoll;G.diceMult=getDiceMult(finalRoll);
+      applyResolution();
+      setTimeout(()=>render(),400);
+    }
+  },80);
+}
+
+function handleConfirmResolve(){
+  const fid=activeFid();const f=G.factions[fid];
+  if(G.selPM){
+    f.pmHand=f.pmHand.filter(c=>c.id!==G.selPM.id);
+    if(f.pmDrawn&&f.pmDrawn.id!==G.selPM.id&&f.pmHand.length<1)f.pmHand.push(f.pmDrawn);
+  } else if(f.pmDrawn&&f.pmHand.length<1) f.pmHand.push(f.pmDrawn);
+  f.pmDrawn=null;
+  if(G.selDM){
+    f.dmHand=f.dmHand.filter(c=>c.id!==G.selDM.id);
+    if(f.dmDrawn&&f.dmDrawn.id!==G.selDM.id&&f.dmHand.length<1)f.dmHand.push(f.dmDrawn);
+  } else if(f.dmDrawn&&f.dmHand.length<1) f.dmHand.push(f.dmDrawn);
+  f.dmDrawn=null;
+  collectNodeBonus(fid);
+  G.phase='action';render();
+}
+
+function handleActSel(aId){if(!G.actionDone){G.selAction=aId;render();}}
+function handleConfirmAction(){
+  const selA=['aid','trade','sanction','milpact','intel','media','discard','node']
+    .find(x=>x===G.selAction);
+  if(!selA)return;
+  const needsFaction=['aid','trade','sanction','milpact','intel','media'].includes(selA);
+  const needsNode=selA==='node';
+  let target=null;
+  if(needsFaction||needsNode){
+    const sel=document.getElementById('tsel');
+    if(sel)target=sel.value;
+  }
+  const ok=execAction(selA,target);
+  if(ok!==false){G.selAction=null;render();}
+}
+function handleSkipAction(){
+  G.actionDone=true;
+  log(`${G.factions[activeFid()].name} 跳過行動`);
+  render();
+}
+function handleEndTurn(){
+  if(G.tension>=8) log(`⚠️ 緊張值 ${G.tension}：${G.tension>=10?'熱戰狀態！':'冷戰狀態'}`);
+  advanceTurn();
+}
+function handleNodeClick(nid){
+  const n=G.nodes[nid];
+  const b=Object.entries(n.bonuses).map(([s,v])=>`${stat_lbl(s)}+${v}/回`).join('，');
+  log(`節點：${n.name}（${fn(n.owner)}控制）${b}`);
+  render();
+}
+
+// ═══ START ═══
+initGame();
+</script>
+</body>
+</html>
