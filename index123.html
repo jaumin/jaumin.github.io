@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaumin · 學習資源站</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0c0e14;
+    --surface:  #141720;
+    --card:     #1a1e2b;
+    --border:   #252a3a;
+    --accent:   #5b8dee;
+    --gold:     #f0b429;
+    --teal:     #2dd4bf;
+    --rose:     #f87171;
+    --text:     #dce3f0;
+    --muted:    #6b7590;
+    --serif:    'Noto Serif TC', serif;
+    --mono:     'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--serif);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Background glow blobs ── */
+  .glow-1, .glow-2 {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-1 {
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, #5b8dee18, transparent 70%);
+    top: -160px; left: -160px;
+  }
+  .glow-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #2dd4bf12, transparent 70%);
+    bottom: -80px; right: -80px;
+  }
+
+  /* ── Layout ── */
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 72px 0 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid #5b8dee35;
+    border-radius: 99px;
+    background: #5b8dee0a;
+    width: fit-content;
+  }
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--accent);
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .hero-title {
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: transparent;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    margin: 8px 0 36px;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Cards grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 14px 14px 0 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .card:hover {
+    border-color: var(--card-accent, var(--accent));
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px #00000030;
+  }
+  .card:hover::before { opacity: 1; }
+
+  /* Accent variants */
+  .card.blue  { --card-accent: var(--accent); }
+  .card.blue::before  { background: var(--accent); }
+  .card.teal  { --card-accent: var(--teal); }
+  .card.teal::before  { background: var(--teal); }
+  .card.gold  { --card-accent: var(--gold); }
+  .card.gold::before  { background: var(--gold); }
+  .card.rose  { --card-accent: var(--rose); }
+  .card.rose::before  { background: var(--rose); }
+
+  .card-icon {
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+  }
+
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.65;
+    flex: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  .card-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 99px;
+    background: #ffffff08;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .card-arrow {
+    font-size: 13px;
+    color: var(--muted);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .card:hover .card-arrow {
+    color: var(--card-accent, var(--accent));
+    transform: translateX(3px);
+  }
+
+  /* ── Download card (for .docx) ── */
+  .card.download {
+    border-style: dashed;
+  }
+  .card.download:hover {
+    border-style: solid;
+  }
+
+  /* ── Footer ── */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 28px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">jaumin.github.io</div>
+    <h1 class="hero-title">學習工具<br><em>資源站</em></h1>
+    <p class="hero-sub">銀行授信認證備考、APAC 桌遊規則與地圖，所有工具集中一處，隨時取用。</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 授信內證 -->
+  <div class="section-label">授信業務內部認證</div>
+  <div class="grid">
+
+    <a href="授信內證語音朗讀.html" class="card teal">
+      <div class="card-icon">🎧</div>
+      <div class="card-title">語音朗讀系統</div>
+      <div class="card-desc">全 903 題語音播放，支援速度調整、關鍵字搜尋、自動連續播放，開車通勤也能複習。</div>
+      <div class="card-footer">
+        <span class="card-tag">TTS · 903 題</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="loannote.html" class="card blue">
+      <div class="card-icon">📖</div>
+      <div class="card-title">準備筆記（網頁版）</div>
+      <div class="card-desc">依題號排序的完整解析筆記，含正確答案與淺顯原因說明。</div>
+      <div class="card-footer">
+        <span class="card-tag">Notes · 903 題</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="loantest.html" class="card gold">
+      <div class="card-icon">✍️</div>
+      <div class="card-title">模擬測驗</div>
+      <div class="card-desc">隨機出題、計時、即時評分，模擬正式考試節奏，測出真實實力。</div>
+      <div class="card-footer">
+        <span class="card-tag">Quiz · 練習模式</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="loanread.html" class="card blue">
+      <div class="card-icon">🗂️</div>
+      <div class="card-title">快速瀏覽</div>
+      <div class="card-desc">簡潔卡片格式，快速翻閱所有題目與答案，適合考前快速掃描複習。</div>
+      <div class="card-footer">
+        <span class="card-tag">Reader · 快翻模式</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="授信內證準備筆記.docx" class="card download gold" download>
+      <div class="card-icon">📄</div>
+      <div class="card-title">準備筆記下載</div>
+      <div class="card-desc">完整 Word 文件，可列印或在 Word 中閱讀，離線複習首選。</div>
+      <div class="card-footer">
+        <span class="card-tag">DOCX · 下載</span>
+        <span class="card-arrow">↓</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- APAC 桌遊 -->
+  <div class="section-label">APAC 桌遊</div>
+  <div class="grid">
+
+    <a href="APAC_Game.html" class="card rose">
+      <div class="card-icon">🎮</div>
+      <div class="card-title">APAC 遊戲主頁</div>
+      <div class="card-desc">APAC 桌遊互動主頁，快速進入遊戲流程。</div>
+      <div class="card-footer">
+        <span class="card-tag">Game</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="APAC_MapBoard.html" class="card rose">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">APAC 地圖版</div>
+      <div class="card-desc">互動式地圖版面，掌握全局佈局與地區分布。</div>
+      <div class="card-footer">
+        <span class="card-tag">Map · 互動</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="APAC_Rulebook_v2.html" class="card rose">
+      <div class="card-icon">📜</div>
+      <div class="card-title">APAC 規則書 v2</div>
+      <div class="card-desc">完整遊戲規則說明，初學者入門與老手查規則的最佳參考。</div>
+      <div class="card-footer">
+        <span class="card-tag">Rulebook · v2</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+</div>
+
+<footer>
+  <span>© 2025 jaumin</span>
+  <span>·</span>
+  <a href="https://github.com/jaumin/jaumin.github.io" target="_blank">GitHub</a>
+</footer>
+
+</body>
+</html>
