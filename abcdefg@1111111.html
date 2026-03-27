@@ -94,7 +94,37 @@ body {
 .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
 
 .topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
-.counter { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.goto-wrap { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.goto-input {
+  width: 62px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 5px 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.goto-input::-webkit-outer-spin-button,
+.goto-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.goto-input:focus { border-color: var(--accent); }
+.goto-btn {
+  padding: 5px 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.goto-btn:hover { border-color: var(--accent); color: var(--accent); }
+.goto-btn:active { transform: scale(.94); }
 .counter strong { color: var(--text); }
 
 .btn-shuffle {
@@ -411,6 +441,12 @@ kbd {
   <div class="topbar-right">
     <button class="btn-shuffle" id="shuffleBtn" onclick="toggleShuffle()">⇌ 隨機</button>
     <div class="counter">第 <strong id="curNum">—</strong> / <strong id="totalNum">—</strong> 張</div>
+    <div class="goto-wrap">
+      <input class="goto-input" type="number" id="gotoInput" placeholder="題號" min="1" max="903"
+        inputmode="numeric" pattern="[0-9]*"
+        onkeydown="if(event.key==='Enter'){doGoto();event.preventDefault();}">
+      <button class="goto-btn" onclick="doGoto()">GO</button>
+    </div>
   </div>
 </div>
 
@@ -478,7 +514,7 @@ kbd {
     <div class="kbd-item"><kbd>←</kbd><kbd>→</kbd> 上/下張</div>
     <div class="kbd-item"><kbd>O</kbd> 已掌握</div>
     <div class="kbd-item"><kbd>X</kbd> 再複習</div>
-    <div class="kbd-item"><kbd>G</kbd> 跳題號</div>
+    <div class="kbd-item"><kbd>G</kbd> 游標跳至題號欄</div>
   </div>
 
 </div>
@@ -686,14 +722,25 @@ document.addEventListener('keydown', e => {
   else if (e.code === 'ArrowRight') nextCard();
   else if (e.code === 'KeyO') { if (flipped) markKnew(); }
   else if (e.code === 'KeyX') { if (flipped) markForgot(); }
-  else if (e.code === 'KeyG') {
-    const n = parseInt(prompt('跳至題號：'));
-    if (!n) return;
-    const i = deck.findIndex(c => c.n === n);
-    if (i === -1) { alert('找不到第 ' + n + ' 題'); return; }
-    idx = i; renderCard();
-  }
+  else if (e.code === 'KeyG') { e.preventDefault(); document.getElementById('gotoInput').focus(); }
 });
+
+// ── Go to question ─────────────────────────────────────────────────────────
+function doGoto() {
+  const input = document.getElementById('gotoInput');
+  const n = parseInt(input.value);
+  if (!n) return;
+  const i = deck.findIndex(c => c.n === n);
+  if (i === -1) {
+    input.style.borderColor = 'var(--rose)';
+    setTimeout(() => input.style.borderColor = '', 1200);
+    return;
+  }
+  idx = i;
+  input.value = '';
+  input.blur();
+  renderCard();
+}
 
 // ── Touch swipe ────────────────────────────────────────────────────────────
 let touchX = null;
