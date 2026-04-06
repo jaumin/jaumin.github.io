@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B1–B2 單字闖關遊戲</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c12;
+  --surface: #13151f;
+  --card: #181b28;
+  --border: #252836;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --green: #00ff9d;
+  --red: #ff3d6b;
+  --yellow: #ffd93d;
+  --purple: #b06bff;
+  --text: #e8eaf0;
+  --muted: #5a607a;
+  --radius: 14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 0 60px;
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(0,229,255,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 100%, rgba(176,107,255,0.05) 0%, transparent 45%);
+}
+
+/* ── SCREENS ── */
+.screen { width: 100%; max-width: 500px; padding: 24px 16px; display: none; flex-direction: column; align-items: center; }
+.screen.active { display: flex; }
+
+/* ── HOME ── */
+.home-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px; letter-spacing: 0.3em; color: var(--accent);
+  margin-top: 32px; margin-bottom: 8px;
+}
+.home-title {
+  font-family: 'Lora', serif;
+  font-size: 30px; font-weight: 600; text-align: center; line-height: 1.25;
+  margin-bottom: 6px;
+}
+.home-sub { font-size: 13px; color: var(--muted); margin-bottom: 36px; }
+
+.mode-cards { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.mode-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 16px;
+}
+.mode-card:hover { border-color: var(--accent); background: rgba(0,229,255,0.05); transform: translateY(-2px); }
+.mode-card.selected { border-color: var(--accent); background: rgba(0,229,255,0.08); }
+.mode-icon { font-size: 28px; flex-shrink: 0; }
+.mode-info { flex: 1; }
+.mode-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.mode-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.mode-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; padding: 3px 8px;
+  border-radius: 20px; flex-shrink: 0;
+}
+.badge-hard { background: rgba(255,61,107,0.15); color: var(--red); border: 1px solid rgba(255,61,107,0.3); }
+.badge-easy { background: rgba(0,255,157,0.1); color: var(--green); border: 1px solid rgba(0,255,157,0.25); }
+
+.qty-row { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-bottom: 24px; }
+.qty-label { font-size: 13px; color: var(--muted); }
+.qty-btns { display: flex; gap: 8px; }
+.qty-btn {
+  padding: 8px 18px; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.18s;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+.qty-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.08); }
+
+.btn-start {
+  width: 100%; padding: 16px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #0099cc);
+  border: none; color: #0a0c12; font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+  transition: opacity 0.2s, transform 0.15s;
+  letter-spacing: 0.05em;
+}
+.btn-start:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── GAME SCREEN ── */
+.game-hud {
+  width: 100%; display: flex; justify-content: space-between;
+  align-items: center; padding: 12px 0 0; margin-bottom: 8px;
+}
+.hud-item { text-align: center; }
+.hud-val { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; }
+.hud-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 2px; }
+.hud-score .hud-val { color: var(--accent); }
+.hud-streak .hud-val { color: var(--yellow); }
+.hud-item.hud-prog { flex: 1; padding: 0 12px; }
+.prog-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 3px; transition: width 0.4s; }
+.prog-text { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+/* Timer ring */
+.timer-wrap { position: relative; width: 72px; height: 72px; margin: 16px auto 8px; }
+.timer-svg { transform: rotate(-90deg); }
+.timer-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+.timer-arc { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.1s linear, stroke 0.3s; }
+.timer-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
+}
+
+/* Question area */
+.q-category {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.q-label {
+  font-size: 12px; color: var(--muted); margin-bottom: 10px; text-align: center;
+}
+.q-main {
+  font-family: 'Lora', serif;
+  font-size: 26px; font-weight: 600; text-align: center;
+  line-height: 1.3; color: var(--text);
+  min-height: 68px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
+}
+.q-hint {
+  font-family: 'DM Mono', monospace; font-size: 14px;
+  color: var(--accent); letter-spacing: 0.08em; text-align: center; margin-bottom: 20px;
+  min-height: 22px;
+}
+
+/* Options */
+.options { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.opt-btn {
+  padding: 14px 10px;
+  border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-size: 13px; font-family: 'Lora', serif;
+  cursor: pointer; transition: all 0.15s;
+  text-align: center; line-height: 1.4;
+  min-height: 58px; display: flex; align-items: center; justify-content: center;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(0,229,255,0.06); }
+.opt-btn.correct  { border-color: var(--green); background: rgba(0,255,157,0.12); color: var(--green); }
+.opt-btn.wrong    { border-color: var(--red);   background: rgba(255,61,107,0.1);  color: var(--red); }
+.opt-btn.reveal   { border-color: var(--green); background: rgba(0,255,157,0.06); color: var(--green); opacity: 0.7; }
+.opt-btn:disabled { cursor: default; }
+
+/* Feedback bar */
+.feedback {
+  width: 100%; padding: 12px 16px; border-radius: 10px;
+  text-align: center; font-size: 14px; font-weight: 700;
+  min-height: 44px; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: all 0.2s;
+  opacity: 0;
+}
+.feedback.show { opacity: 1; }
+.feedback.ok  { background: rgba(0,255,157,0.1);  color: var(--green); border: 1px solid rgba(0,255,157,0.3); }
+.feedback.bad { background: rgba(255,61,107,0.1); color: var(--red);   border: 1px solid rgba(255,61,107,0.3); }
+.feedback.timeout { background: rgba(255,217,61,0.1); color: var(--yellow); border: 1px solid rgba(255,217,61,0.3); }
+
+/* Streak popup */
+.streak-popup {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%) scale(0.8);
+  background: rgba(255,217,61,0.15); border: 1px solid rgba(255,217,61,0.5);
+  color: var(--yellow); padding: 8px 20px; border-radius: 20px;
+  font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700;
+  opacity: 0; pointer-events: none; z-index: 100;
+  transition: all 0.3s;
+}
+.streak-popup.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+/* ── RESULTS ── */
+.result-header { text-align: center; margin: 24px 0 20px; }
+.result-grade {
+  font-family: 'Orbitron', monospace;
+  font-size: 52px; font-weight: 900; line-height: 1;
+  margin-bottom: 6px;
+}
+.result-msg { font-family: 'Lora', serif; font-size: 18px; font-style: italic; color: var(--muted); }
+.result-stats {
+  width: 100%; display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+.rstat {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 8px; text-align: center;
+}
+.rstat-val { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 700; }
+.rstat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.wrong-list { width: 100%; margin-bottom: 20px; }
+.wrong-title {
+  font-size: 12px; color: var(--muted); letter-spacing: 0.1em;
+  font-family: 'DM Mono', monospace; margin-bottom: 10px;
+}
+.wrong-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; margin-bottom: 6px; gap: 10px;
+}
+.wrong-en { font-family: 'Lora', serif; font-size: 14px; flex: 1; }
+.wrong-zh { font-size: 13px; color: var(--accent2); flex-shrink: 0; }
+
+.result-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.btn-retry {
+  padding: 14px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #0099cc);
+  border: none; color: #0a0c12; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+}
+.btn-retry-wrong {
+  padding: 14px; border-radius: 12px;
+  background: rgba(255,61,107,0.1); border: 1px solid rgba(255,61,107,0.3);
+  color: var(--red); font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+}
+.btn-home {
+  padding: 12px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); font-size: 14px;
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+}
+
+/* Animations */
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes pop   { 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
+.shake { animation: shake 0.3s ease; }
+.pop   { animation: pop   0.2s ease; }
+
+@keyframes countIn { from{opacity:0;transform:scale(1.3)} to{opacity:1;transform:scale(1)} }
+.q-main.new { animation: countIn 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screenHome">
+  <div class="home-logo">TOEIC · B1–B2 · WORD GAME</div>
+  <h1 class="home-title">單字闖關</h1>
+  <p class="home-sub">依照老師規則訓練反射速度</p>
+
+  <div class="mode-cards">
+    <div class="mode-card selected" data-mode="zh2en" onclick="selectMode(this,'zh2en')">
+      <div class="mode-icon">🇨🇳→🇬🇧</div>
+      <div class="mode-info">
+        <div class="mode-name">看中文說英文</div>
+        <div class="mode-desc">看到中文翻譯，3 秒內選出正確英文片語</div>
+      </div>
+      <div class="mode-badge badge-hard">進階</div>
+    </div>
+    <div class="mode-card" data-mode="hint" onclick="selectMode(this,'hint')">
+      <div class="mode-icon">🔤</div>
+      <div class="mode-info">
+        <div class="mode-name">首字母提示模式</div>
+        <div class="mode-desc">看到首字母提示，選出完整片語（仿 Self-Review）</div>
+      </div>
+      <div class="mode-badge badge-easy">基礎</div>
+    </div>
+    <div class="mode-card" data-mode="en2zh" onclick="selectMode(this,'en2zh')">
+      <div class="mode-icon">🇬🇧→🇨🇳</div>
+      <div class="mode-info">
+        <div class="mode-name">看英文選中文</div>
+        <div class="mode-desc">看到英文片語，選出正確中文意思</div>
+      </div>
+      <div class="mode-badge badge-easy">暖身</div>
+    </div>
+  </div>
+
+  <div class="qty-row">
+    <div class="qty-label">每回合題數</div>
+    <div class="qty-btns">
+      <button class="qty-btn" data-qty="7"  onclick="selectQty(this,7)">7</button>
+      <button class="qty-btn selected" data-qty="10" onclick="selectQty(this,10)">10</button>
+      <button class="qty-btn" data-qty="15" onclick="selectQty(this,15)">15</button>
+      <button class="qty-btn" data-qty="56" onclick="selectQty(this,56)">全部</button>
+    </div>
+  </div>
+
+  <button class="btn-start" onclick="startGame()">開始闖關 →</button>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screenGame">
+  <div class="game-hud" style="width:100%;">
+    <div class="hud-item hud-score">
+      <div class="hud-val" id="hudScore">0</div>
+      <div class="hud-lbl">SCORE</div>
+    </div>
+    <div class="hud-item hud-prog">
+      <div class="prog-text" id="progText">1 / 10</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+    <div class="hud-item hud-streak">
+      <div class="hud-val" id="hudStreak">×1</div>
+      <div class="hud-lbl">COMBO</div>
+    </div>
+  </div>
+
+  <div class="timer-wrap">
+    <svg class="timer-svg" width="72" height="72" viewBox="0 0 72 72">
+      <circle class="timer-bg" cx="36" cy="36" r="30"/>
+      <circle class="timer-arc" id="timerArc" cx="36" cy="36" r="30"
+        stroke-dasharray="188.5" stroke-dashoffset="0" stroke="var(--accent)"/>
+    </svg>
+    <div class="timer-num" id="timerNum">3</div>
+  </div>
+
+  <div class="q-category" id="qCategory">VERB PHRASE</div>
+  <div class="q-label" id="qLabel">看中文，選出正確英文片語</div>
+  <div class="q-main" id="qMain">續約</div>
+  <div class="q-hint" id="qHint"></div>
+
+  <div class="options" id="optionsGrid"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screenResult">
+  <div class="result-header">
+    <div class="result-grade" id="resultGrade">A</div>
+    <div class="result-msg" id="resultMsg">很棒！繼續加油</div>
+  </div>
+  <div class="result-stats">
+    <div class="rstat">
+      <div class="rstat-val" id="rCorrect" style="color:var(--green)">0</div>
+      <div class="rstat-lbl">答對</div>
+    </div>
+    <div class="rstat">
+      <div class="rstat-val" id="rScore" style="color:var(--accent)">0</div>
+      <div class="rstat-lbl">得分</div>
+    </div>
+    <div class="rstat">
+      <div class="rstat-val" id="rMax" style="color:var(--yellow)">0</div>
+      <div class="rstat-lbl">最高連擊</div>
+    </div>
+  </div>
+  <div class="wrong-list" id="wrongList"></div>
+  <div class="result-btns">
+    <button class="btn-retry" onclick="retryGame()">再玩一局（同設定）</button>
+    <button class="btn-retry-wrong" id="btnRetryWrong" onclick="retryWrong()" style="display:none">只練答錯的</button>
+    <button class="btn-home" onclick="goHome()">← 返回選單</button>
+  </div>
+</div>
+
+<!-- Streak popup -->
+<div class="streak-popup" id="streakPopup"></div>
+
+<script>
+const ALL_CARDS = [
+  {id:1,  en:"renew a contract",          zh:"續約",            cat:"verb"},
+  {id:2,  en:"set up an account",         zh:"建立帳戶",         cat:"verb"},
+  {id:3,  en:"confirm a reservation",     zh:"確認訂位",         cat:"verb"},
+  {id:4,  en:"inquire about a room",      zh:"詢問房間",         cat:"verb"},
+  {id:5,  en:"arrange for a tour",        zh:"安排導覽",         cat:"verb"},
+  {id:6,  en:"apply for a position",      zh:"申請工作",         cat:"verb"},
+  {id:7,  en:"conduct a survey",          zh:"進行調查",         cat:"verb"},
+  {id:8,  en:"interview someone",         zh:"面試",             cat:"verb"},
+  {id:9,  en:"go over results",           zh:"檢討結果",         cat:"verb"},
+  {id:10, en:"submit ideas",              zh:"提交想法",         cat:"verb"},
+  {id:11, en:"respond to a message",      zh:"回覆訊息",         cat:"verb"},
+  {id:12, en:"negotiate a contract",      zh:"談判合約",         cat:"verb"},
+  {id:13, en:"adjust the timetable",      zh:"調整時間表",        cat:"verb"},
+  {id:14, en:"notify someone of changes", zh:"通知變更",         cat:"verb"},
+  {id:15, en:"inform clients of delays",  zh:"通知客戶延誤",      cat:"verb"},
+  {id:16, en:"repair equipment",          zh:"維修設備",         cat:"verb"},
+  {id:17, en:"work on a report",          zh:"處理報告",         cat:"verb"},
+  {id:18, en:"prepare a marketing plan",  zh:"準備行銷計畫",      cat:"verb"},
+  {id:19, en:"deal with consultants",     zh:"與顧問合作",        cat:"verb"},
+  {id:20, en:"offer advice",              zh:"提供建議",         cat:"verb"},
+  {id:21, en:"describe a promotion",      zh:"描述促銷",         cat:"verb"},
+  {id:22, en:"register for a course",     zh:"報名課程",         cat:"verb"},
+  {id:23, en:"submit files",              zh:"提交文件",         cat:"verb"},
+  {id:24, en:"rental contract",           zh:"租約",             cat:"noun"},
+  {id:25, en:"business account",          zh:"商業帳戶",         cat:"noun"},
+  {id:26, en:"extra insurance",           zh:"額外保險",         cat:"noun"},
+  {id:27, en:"existing reservation",      zh:"既有訂單",         cat:"noun"},
+  {id:28, en:"off-season visit",          zh:"淡季參觀",         cat:"noun"},
+  {id:29, en:"sales strategy",            zh:"銷售策略",         cat:"noun"},
+  {id:30, en:"product line",              zh:"產品線",           cat:"noun"},
+  {id:31, en:"study results",             zh:"研究結果",         cat:"noun"},
+  {id:32, en:"subscription rates",        zh:"訂閱費率",         cat:"noun"},
+  {id:33, en:"production schedule",       zh:"生產時程",         cat:"noun"},
+  {id:34, en:"pricing strategy",          zh:"定價策略",         cat:"noun"},
+  {id:35, en:"advertising campaign",      zh:"廣告活動",         cat:"noun"},
+  {id:36, en:"software project",          zh:"軟體專案",         cat:"noun"},
+  {id:37, en:"upcoming conference",       zh:"即將舉行的會議",    cat:"noun"},
+  {id:38, en:"marketing plan",            zh:"行銷計畫",         cat:"noun"},
+  {id:39, en:"recruitment process",       zh:"招聘流程",         cat:"noun"},
+  {id:40, en:"construction job",          zh:"工程工作",         cat:"noun"},
+  {id:41, en:"contract details",          zh:"合約細節",         cat:"noun"},
+  {id:42, en:"shipping rates",            zh:"運費",             cat:"noun"},
+  {id:43, en:"office space",              zh:"辦公室空間",        cat:"noun"},
+  {id:44, en:"manager",                   zh:"經理",             cat:"job"},
+  {id:45, en:"director",                  zh:"主管",             cat:"job"},
+  {id:46, en:"sales representative",      zh:"業務",             cat:"job"},
+  {id:47, en:"marketing staff",           zh:"行銷人員",         cat:"job"},
+  {id:48, en:"technician",                zh:"技術人員",         cat:"job"},
+  {id:49, en:"office worker",             zh:"辦公室員工",        cat:"job"},
+  {id:50, en:"real estate agent",         zh:"房仲",             cat:"job"},
+  {id:51, en:"marketing",                 zh:"行銷",             cat:"job"},
+  {id:52, en:"advertising",               zh:"廣告",             cat:"job"},
+  {id:53, en:"real estate",               zh:"房地產",           cat:"job"},
+  {id:54, en:"customer service",          zh:"客服",             cat:"job"},
+  {id:55, en:"construction",              zh:"建築業",           cat:"job"},
+  {id:56, en:"logistics",                 zh:"物流",             cat:"job"},
+];
+
+const CAT_LABEL = {verb:"VERB PHRASE", noun:"NOUN PHRASE", job:"JOB / INDUSTRY"};
+
+// ── State ──
+let mode = 'zh2en', qty = 10;
+let deck = [], pos = 0, score = 0, combo = 0, maxCombo = 0;
+let wrongCards = [];
+let timerInterval = null, timeLeft = 0;
+let answered = false;
+let retryDeck = null;
+
+const TTS_OK = typeof window !== 'undefined' && 'speechSynthesis' in window;
+let ttsVoice = null;
+function loadVoices() {
+  if (!TTS_OK) return;
+  const v = window.speechSynthesis.getVoices();
+  ttsVoice = v.find(x => x.lang==='en-US' && /samantha|zira|karen/i.test(x.name))
+          || v.find(x => x.lang==='en-US') || v.find(x => x.lang.startsWith('en')) || null;
+}
+if (TTS_OK) { loadVoices(); if (window.speechSynthesis.onvoiceschanged !== undefined) window.speechSynthesis.onvoiceschanged = loadVoices; }
+
+function speak(text) {
+  if (!TTS_OK) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.85; if(ttsVoice) u.voice=ttsVoice;
+  window.speechSynthesis.speak(u);
+}
+
+// ── Home controls ──
+function selectMode(el, m) {
+  mode = m;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectQty(el, q) {
+  qty = q;
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+
+function buildHint(en) {
+  return en.split(' ').map(w => {
+    if (w.length <= 2) return w[0] + '_'.repeat(w.length-1);
+    return w[0] + '_'.repeat(Math.max(w.length-1, 4));
+  }).join(' ');
+}
+
+// ── Game Start ──
+function startGame(customDeck) {
+  showScreen('screenGame');
+  score = 0; combo = 0; maxCombo = 0; pos = 0; wrongCards = [];
+  deck = customDeck ? [...customDeck] : shuffle([...ALL_CARDS]).slice(0, qty);
+  updateHUD();
+  showQuestion();
+}
+
+function retryGame() { startGame(); }
+function retryWrong() { if (wrongCards.length > 0) startGame(wrongCards); }
+function goHome()     { showScreen('screenHome'); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Question ──
+function showQuestion() {
+  if (pos >= deck.length) { showResults(); return; }
+
+  clearTimer();
+  answered = false;
+  const card = deck[pos];
+
+  // Update progress
+  document.getElementById('progText').textContent = `${pos+1} / ${deck.length}`;
+  document.getElementById('progFill').style.width = (pos/deck.length*100)+'%';
+
+  // Category
+  document.getElementById('qCategory').textContent = CAT_LABEL[card.cat] || '';
+
+  // Mode-specific display
+  const qMain = document.getElementById('qMain');
+  qMain.classList.remove('new');
+  void qMain.offsetWidth;
+  qMain.classList.add('new');
+
+  if (mode === 'zh2en') {
+    document.getElementById('qLabel').textContent = '看中文，選出正確英文片語';
+    qMain.textContent = card.zh;
+    document.getElementById('qHint').textContent = '';
+  } else if (mode === 'hint') {
+    document.getElementById('qLabel').textContent = '看首字母提示，選出完整片語';
+    qMain.textContent = buildHint(card.en);
+    qMain.style.fontFamily = "'DM Mono', monospace";
+    qMain.style.fontSize = '17px';
+    document.getElementById('qHint').textContent = card.zh;
+  } else {
+    document.getElementById('qLabel').textContent = '看英文，選出正確中文意思';
+    qMain.textContent = card.en;
+    qMain.style.fontFamily = "'Lora', serif";
+    qMain.style.fontSize = '22px';
+    document.getElementById('qHint').textContent = '';
+  }
+
+  // Reset font for zh2en mode
+  if (mode === 'zh2en') {
+    qMain.style.fontFamily = "'Lora', serif";
+    qMain.style.fontSize = '26px';
+  }
+
+  // Build options
+  const wrongPool = ALL_CARDS.filter(c => c.id !== card.id);
+  shuffle(wrongPool);
+  const distractors = wrongPool.slice(0, 3);
+  const options = shuffle([card, ...distractors]);
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = mode === 'en2zh' ? opt.zh : opt.en;
+    btn.onclick = () => answer(btn, opt.id === card.id, card);
+    grid.appendChild(btn);
+  });
+
+  // Feedback reset
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback'; fb.textContent = '';
+
+  // Timer (only for zh2en and hint modes — not for en2zh warmup)
+  const timerWrap = document.querySelector('.timer-wrap');
+  if (mode === 'en2zh') {
+    timerWrap.style.display = 'none';
+  } else {
+    timerWrap.style.display = '';
+    startTimer(3);
+  }
+
+  updateHUD();
+}
+
+// ── Timer ──
+const CIRCUMFERENCE = 2 * Math.PI * 30; // 188.5
+function startTimer(seconds) {
+  timeLeft = seconds * 10; // 0.1s ticks
+  const arc = document.getElementById('timerArc');
+  const num = document.getElementById('timerNum');
+  arc.style.stroke = 'var(--accent)';
+  arc.style.strokeDashoffset = '0';
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const frac = timeLeft / (seconds * 10);
+    arc.style.strokeDashoffset = CIRCUMFERENCE * (1 - frac);
+    const secs = Math.ceil(timeLeft / 10);
+    num.textContent = secs;
+
+    if (frac < 0.34) arc.style.stroke = 'var(--red)';
+    else if (frac < 0.67) arc.style.stroke = 'var(--yellow)';
+
+    if (timeLeft <= 0) {
+      clearTimer();
+      onTimeout();
+    }
+  }, 100);
+}
+
+function clearTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function onTimeout() {
+  if (answered) return;
+  answered = true;
+  combo = 0;
+  updateHUD();
+  const card = deck[pos];
+
+  // Reveal correct
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    const text = btn.textContent;
+    const isCorrect = mode === 'en2zh' ? text === card.zh : text === card.en;
+    if (isCorrect) btn.classList.add('reveal');
+    btn.disabled = true;
+  });
+
+  showFeedback('timeout', '⏰ 時間到！  正解：' + (mode==='en2zh' ? card.zh : card.en));
+  speak(card.en);
+  if (!wrongCards.find(c=>c.id===card.id)) wrongCards.push(card);
+
+  setTimeout(nextQ, 1800);
+}
+
+// ── Answer ──
+function answer(btn, isCorrect, card) {
+  if (answered) return;
+  answered = true;
+  clearTimer();
+  speak(card.en);
+
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    const text = b.textContent;
+    const correct = mode === 'en2zh' ? text === card.zh : text === card.en;
+    if (correct) b.classList.add('correct');
+    b.disabled = true;
+  });
+
+  const timeBonus = mode !== 'en2zh' ? Math.ceil(timeLeft / 10) : 0; // 0-3 time bonus
+
+  if (isCorrect) {
+    combo++;
+    if (combo > maxCombo) maxCombo = combo;
+    const multiplier = Math.min(combo, 5);
+    const pts = (10 + timeBonus * 3) * multiplier;
+    score += pts;
+    showFeedback('ok', combo >= 3 ? `🔥 COMBO ×${combo}  +${pts}pts` : `✓ 正確！  +${pts}pts`);
+    if (combo >= 3) showStreakPopup(`🔥 ${combo} 連擊！`);
+    btn.classList.add('pop');
+  } else {
+    btn.classList.add('wrong');
+    combo = 0;
+    showFeedback('bad', '✗ 答錯  →  ' + (mode==='en2zh' ? card.zh : card.en));
+    if (!wrongCards.find(c=>c.id===card.id)) wrongCards.push(card);
+    const gameEl = document.getElementById('screenGame');
+    gameEl.classList.add('shake');
+    setTimeout(()=>gameEl.classList.remove('shake'), 300);
+  }
+  updateHUD();
+  setTimeout(nextQ, 1600);
+}
+
+function nextQ() { pos++; showQuestion(); }
+
+function showFeedback(type, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + type;
+  fb.textContent = msg;
+}
+
+function updateHUD() {
+  document.getElementById('hudScore').textContent = score;
+  document.getElementById('hudStreak').textContent = '×' + Math.min(combo+1, 5);
+  // Color combos
+  const sv = document.getElementById('hudStreak');
+  if (combo >= 4) sv.style.color = 'var(--red)';
+  else if (combo >= 2) sv.style.color = 'var(--accent2)';
+  else sv.style.color = 'var(--yellow)';
+}
+
+let streakTimer = null;
+function showStreakPopup(msg) {
+  const p = document.getElementById('streakPopup');
+  p.textContent = msg;
+  p.classList.add('show');
+  clearTimeout(streakTimer);
+  streakTimer = setTimeout(()=>p.classList.remove('show'), 1200);
+}
+
+// ── Results ──
+function showResults() {
+  showScreen('screenResult');
+  const total = deck.length;
+  const correct = total - wrongCards.length;
+  const pct = Math.round(correct / total * 100);
+
+  let grade, msg;
+  if (pct === 100) { grade='S'; msg='完美！全部反射！🎉'; }
+  else if (pct >= 80) { grade='A'; msg='很棒！繼續保持！💪'; }
+  else if (pct >= 60) { grade='B'; msg='不錯，把答錯的再練一遍'; }
+  else if (pct >= 40) { grade='C'; msg='繼續加油，熟能生巧！'; }
+  else { grade='D'; msg='先回頭複習閃卡，再來挑戰'; }
+
+  const gradeEl = document.getElementById('resultGrade');
+  gradeEl.textContent = grade;
+  gradeEl.style.color = pct>=80 ? 'var(--green)' : pct>=60 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('rCorrect').textContent = `${correct}/${total}`;
+  document.getElementById('rScore').textContent = score;
+  document.getElementById('rMax').textContent = maxCombo;
+
+  const wl = document.getElementById('wrongList');
+  wl.innerHTML = '';
+  if (wrongCards.length > 0) {
+    const title = document.createElement('div');
+    title.className = 'wrong-title';
+    title.textContent = `▸ 需要複習的片語（${wrongCards.length} 個）`;
+    wl.appendChild(title);
+    wrongCards.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'wrong-item';
+      item.innerHTML = `<span class="wrong-en">${c.en}</span><span class="wrong-zh">${c.zh}</span>`;
+      item.onclick = () => speak(c.en);
+      wl.appendChild(item);
+    });
+    document.getElementById('btnRetryWrong').style.display = '';
+  } else {
+    document.getElementById('btnRetryWrong').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
