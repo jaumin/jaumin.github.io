@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>倒數100天・離開紐約分行</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════
+       CSS VARIABLES & RESET
+    ═══════════════════════════════════════ */
+    :root {
+      --navy:       #0d1f3c;
+      --navy-light: #1a3460;
+      --gold:       #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-pale:  #f5e9c8;
+      --white:      #fafaf8;
+      --cream:      #f2ead8;
+      --text-dark:  #1a1a2e;
+      --glass:      rgba(13, 31, 60, 0.72);
+      --glass-gold: rgba(201, 168, 76, 0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Serif TC', serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════ */
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #bg-photo {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: opacity 1.2s ease;
+      z-index: 0;
+    }
+    #bg-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(13,31,60,0.78) 0%,
+        rgba(13,31,60,0.45) 40%,
+        rgba(13,31,60,0.70) 100%
+      );
+    }
+
+    /* Decorative gold lines */
+    .deco-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      height: 1px;
+      width: 60%;
+      opacity: 0.5;
+    }
+    .deco-line.top { top: 18%; left: 20%; }
+    .deco-line.bottom { bottom: 18%; left: 20%; }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+      animation: fadeUp 1.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(1rem, 2.2vw, 1.4rem);
+      letter-spacing: 0.25em;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+
+    .hero-days-wrapper {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .hero-label-pre {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: var(--cream);
+      letter-spacing: 0.1em;
+    }
+    .hero-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(5rem, 18vw, 11rem);
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 4px 40px rgba(201,168,76,0.4);
+      letter-spacing: -0.02em;
+    }
+    .hero-label-post {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: var(--cream);
+      letter-spacing: 0.1em;
+    }
+
+    .hero-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+      color: var(--white);
+      letter-spacing: 0.12em;
+      margin-bottom: 32px;
+    }
+
+    .hero-divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 28px;
+    }
+
+    .quote-block {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 2px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: relative;
+    }
+    .quote-block::before, .quote-block::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.6;
+    }
+    .quote-block::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .quote-block::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .quote-zh {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 400;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: var(--white);
+      line-height: 1.8;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .quote-en {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(0.88rem, 1.8vw, 1.05rem);
+      color: var(--gold-light);
+      line-height: 1.6;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-date {
+      position: absolute;
+      bottom: 32px;
+      right: 40px;
+      z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      color: rgba(245,233,200,0.6);
+      text-transform: uppercase;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.5;
+      animation: bounce 2.4s ease infinite;
+    }
+    .scroll-hint span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+    }
+    .scroll-arrow {
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ═══════════════════════════════════════
+       PROGRESS BAR
+    ═══════════════════════════════════════ */
+    .progress-bar-wrap {
+      background: var(--navy-light);
+      padding: 18px 40px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: var(--gold-pale);
+      opacity: 0.7;
+    }
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    /* ═══════════════════════════════════════
+       GRID SECTION
+    ═══════════════════════════════════════ */
+    #grid-section {
+      padding: 60px 40px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .section-header-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(201,168,76,0.5), transparent);
+    }
+    .section-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+    }
+    .section-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Phase rows */
+    .phase-block {
+      margin-bottom: 4px;
+    }
+    .phase-label-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 2px;
+    }
+    .phase-label {
+      min-width: 110px;
+      padding: 8px 12px;
+      background: var(--navy-light);
+      border-left: 3px solid var(--gold);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      line-height: 1.4;
+      color: var(--gold-pale);
+    }
+    .phase-label strong {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      margin-bottom: 2px;
+    }
+
+    .days-row {
+      display: grid;
+      grid-template-columns: 110px repeat(10, 1fr);
+      gap: 3px;
+      margin-bottom: 3px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 3px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.7rem, 1.2vw, 0.92rem);
+      font-weight: 400;
+      color: rgba(245,233,200,0.45);
+      background: rgba(255,255,255,0.02);
+      cursor: default;
+      transition: all 0.25s ease;
+      position: relative;
+      min-height: 44px;
+    }
+    .day-cell:hover {
+      background: var(--glass-gold);
+      border-color: rgba(201,168,76,0.35);
+      color: var(--gold-pale);
+    }
+    .day-cell.passed {
+      background: rgba(201,168,76,0.08);
+      border-color: rgba(201,168,76,0.25);
+      color: rgba(245,233,200,0.6);
+    }
+    .day-cell.passed::after {
+      content: '✓';
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 0.55rem;
+      color: var(--gold);
+      opacity: 0.7;
+      font-family: sans-serif;
+    }
+    .day-cell.today {
+      background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.12));
+      border: 2px solid var(--gold);
+      color: var(--gold-light);
+      font-weight: 700;
+      box-shadow: 0 0 16px rgba(201,168,76,0.3), inset 0 0 12px rgba(201,168,76,0.08);
+      animation: pulse-gold 2.5s ease infinite;
+    }
+    @keyframes pulse-gold {
+      0%,100% { box-shadow: 0 0 16px rgba(201,168,76,0.3), inset 0 0 12px rgba(201,168,76,0.08); }
+      50%      { box-shadow: 0 0 28px rgba(201,168,76,0.5), inset 0 0 18px rgba(201,168,76,0.15); }
+    }
+    .today-badge {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'Noto Serif TC', serif;
+      font-size: 0.45rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 1px 4px;
+      white-space: nowrap;
+      border-radius: 1px;
+    }
+
+    /* Phase label cell placeholder */
+    .phase-spacer {
+      min-width: 110px;
+    }
+
+    /* ═══════════════════════════════════════
+       FOOTER CARDS
+    ═══════════════════════════════════════ */
+    .footer-band {
+      background: var(--navy-light);
+      border-top: 1px solid rgba(201,168,76,0.15);
+      padding: 48px 40px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .footer-card {
+      padding: 24px;
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.025);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-card-icon {
+      font-size: 1.4rem;
+    }
+    .footer-card-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-light);
+    }
+    .footer-card-text {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: rgba(245,233,200,0.65);
+      letter-spacing: 0.06em;
+    }
+
+    .site-footer {
+      text-align: center;
+      padding: 24px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: rgba(245,233,200,0.3);
+      letter-spacing: 0.15em;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      #grid-section { padding: 40px 16px 60px; }
+      .days-row { grid-template-columns: 80px repeat(10, 1fr); gap: 2px; }
+      .phase-label { min-width: 80px; font-size: 0.62rem; padding: 6px 8px; }
+      .phase-spacer { min-width: 80px; }
+      .day-cell { min-height: 34px; font-size: 0.62rem; }
+      .progress-bar-wrap { padding: 14px 20px; }
+      .footer-band { padding: 32px 16px; }
+      .hero-date { display: none; }
+      .quote-block { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section id="hero">
+  <div id="bg-photo"></div>
+  <div class="deco-line top"></div>
+  <div class="deco-line bottom"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">感謝過去 · 成長現在 · 迎向未來</p>
+
+    <div class="hero-days-wrapper">
+      <span class="hero-label-pre">還有</span>
+      <span class="hero-number" id="days-number">—</span>
+      <span class="hero-label-post">天</span>
+    </div>
+
+    <h1 class="hero-title">離開紐約分行</h1>
+    <div class="hero-divider"></div>
+
+    <div class="quote-block">
+      <p class="quote-zh" id="quote-zh">載入中…</p>
+      <p class="quote-en" id="quote-en"></p>
+    </div>
+  </div>
+
+  <div class="hero-date" id="hero-date"></div>
+
+  <div class="scroll-hint">
+    <span>向下</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PROGRESS BAR
+════════════════════════════════════════════ -->
+<div class="progress-bar-wrap">
+  <div class="progress-meta">
+    <span id="prog-left">第 — 天</span>
+    <span id="prog-pct">—% 完成</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     COUNTDOWN GRID
+════════════════════════════════════════════ -->
+<section id="grid-section">
+  <div class="section-header">
+    <span class="section-icon">📅</span>
+    <span class="section-title">100 天倒數計畫表</span>
+    <div class="section-header-line"></div>
+  </div>
+  <div id="countdown-grid"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER CARDS
+════════════════════════════════════════════ -->
+<div class="footer-band">
+  <div class="footer-inner">
+    <div class="footer-card">
+      <div class="footer-card-icon">⭐</div>
+      <div class="footer-card-title">倒數100天</div>
+      <div class="footer-card-text">每一天都是走向新篇章的一步，帶著紐約分行的寶貴經歷，迎接更廣闊的未來。</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">❤️</div>
+      <div class="footer-card-title">感謝與珍惜</div>
+      <div class="footer-card-text">在這段難忘的旅程中，每一份相遇、每一次挑戰，都成為生命中最珍貴的印記。</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">✈️</div>
+      <div class="footer-card-title">新的旅程</div>
+      <div class="footer-card-text">放下過去的包袱，珍惜現在的經驗，勇敢迎向未來，創造屬於自己的精彩人生！</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">🌟</div>
+      <div class="footer-card-title">更好的自己</div>
+      <div class="footer-card-text">未來充滿無限可能，你已準備好了。帶著勇氣與智慧，開創人生下一個精彩章節。</div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  New York · Memories Forever · <span id="footer-year"></span>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ★  在這裡修改開始日期（第100天的日期）  ★
+   格式：'YYYY-MM-DD'
+   今天 = 第100天，往後每天自動遞減
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const START_DATE = '2026-05-03';
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+// ── NYC photo keywords rotated to add variety across 100 days
+const NYC_KEYWORDS = [
+  'new+york+city+skyline','manhattan+night','brooklyn+bridge',
+  'times+square+new+york','central+park+new+york','empire+state+building',
+  'new+york+city+aerial','statue+of+liberty','new+york+city+street',
+  'manhattan+skyline+sunset',
+];
+
+// ── 100 Chinese + English quotes (Day 100 → Day 1)
+const QUOTES = [
+  ['每一段旅程的開始，都藏著最美麗的祝福。', 'Every great journey begins with a beautiful blessing.'],
+  ['離開，是為了更好的抵達。', 'Departure is the prelude to a better arrival.'],
+  ['帶著感恩的心，迎接每一個新的可能。', 'With a grateful heart, welcome every new possibility.'],
+  ['你的故事，才正要翻開最精彩的那一頁。', 'Your story is just turning to its most brilliant page.'],
+  ['勇敢出發，是給自己最好的禮物。', 'Daring to set out is the best gift you can give yourself.'],
+  ['每一步腳印，都是通往夢想的里程碑。', 'Every footstep is a milestone on the road to your dreams.'],
+  ['紐約教會你的，將是一輩子的財富。', 'What New York taught you is a lifelong treasure.'],
+  ['成長從不停歇，只是換了一個舞台。', 'Growth never stops; it simply finds a new stage.'],
+  ['心懷感謝，所有的相遇都值得珍藏。', 'Be thankful — every encounter is worth treasuring.'],
+  ['新的地平線，正在前方等著你。', 'A new horizon is waiting just ahead of you.'],
+  ['把最好的自己，帶去下一個地方。', 'Bring your best self to the next destination.'],
+  ['回憶是行囊，智慧是指南針。', 'Memories are your luggage, wisdom is your compass.'],
+  ['每一次告別，都是另一個你好的開始。', 'Every farewell is the start of another hello.'],
+  ['放開手，才能擁抱更大的世界。', 'Let go, and you can embrace a wider world.'],
+  ['不是結束，而是一個更好的轉折。', 'Not an ending, but a better turning point.'],
+  ['你已擁有了那份無可取代的紐約經歷。', 'You now carry an irreplaceable New York experience.'],
+  ['未來的你，會感謝今天勇敢的自己。', "Your future self will thank today's courageous you."],
+  ['旅途中的每段風景，都塑造了更完整的你。', 'Every view along the journey shapes a more complete you.'],
+  ['帶著光，去照亮下一段路。', 'Carry your light to illuminate the next path.'],
+  ['感謝過去所有讓你變強大的時刻。', 'Be grateful for every moment that made you stronger.'],
+  ['每個章節結束，都是下一個高潮的序幕。', "Every chapter's end is the prologue to the next peak."],
+  ['你在這裡種下的種子，將在未來開花。', 'The seeds you planted here will bloom in the future.'],
+  ['人生最美的風景，是自己走出來的。', 'The finest scenery in life is what you create yourself.'],
+  ['不論走到哪裡，你都是最精彩的自己。', 'Wherever you go, you are your most remarkable self.'],
+  ['勇氣不是沒有恐懼，而是帶著恐懼前行。', 'Courage is not the absence of fear, but moving forward with it.'],
+  ['你有能力書寫比過去更美好的故事。', 'You have the power to write a story more beautiful than the past.'],
+  ['每一個今天，都是明天最好的基礎。', 'Every today is the best foundation for tomorrow.'],
+  ['相信自己，是改變人生的第一步。', 'Believing in yourself is the first step to changing your life.'],
+  ['在告別中成長，在前行中閃耀。', 'Grow in farewell, shine in moving forward.'],
+  ['這段經歷，讓你更加無可取代。', 'This experience makes you even more irreplaceable.'],
+  ['縱有千種風情，更與何人說——帶著它們繼續前行。', 'With a thousand stories to tell, carry them forward.'],
+  ['最深的根，長出最遠的枝。', 'The deepest roots grow the farthest branches.'],
+  ['你不只是在工作，你在創造歷史。', 'You were not just working; you were making history.'],
+  ['感謝每一位並肩的夥伴，感謝每一個難忘的瞬間。', 'Be grateful for every partner and every unforgettable moment.'],
+  ['勤奮與熱情，永遠是你最閃亮的名片。', 'Diligence and passion are always your brightest credentials.'],
+  ['把遺憾變成動力，把經驗變成智慧。', 'Turn regrets into motivation, experiences into wisdom.'],
+  ['你在紐約走過的路，已成為你骨子裡的風景。', 'The roads you walked in New York are now part of who you are.'],
+  ['改變意味著成長，離開意味著飛翔。', 'Change means growth; leaving means taking flight.'],
+  ['帶著最真的心，迎接最美的未來。', 'With the most sincere heart, welcome the most beautiful future.'],
+  ['你比你想象中更加強大。', 'You are far stronger than you imagine.'],
+  ['每一段難熬的時光，都是為了成就更好的你。', 'Every difficult time is preparing a better version of you.'],
+  ['人生沒有白走的路，每一步都算數。', 'No journey is wasted; every step counts.'],
+  ['你所付出的每一份努力，都在靜靜地發光。', "Every effort you've made is quietly shining somewhere."],
+  ['心若燦爛，所到之處皆是光。', 'A radiant heart brings light to everywhere it goes.'],
+  ['把每一個「再見」都活得像「謝謝」。', 'Live every "goodbye" as if it were a "thank you."'],
+  ['你的下一站，一定更加精彩。', 'Your next destination will surely be even more wonderful.'],
+  ['每當你回望，都會為自己感到驕傲。', 'Whenever you look back, you will feel proud of yourself.'],
+  ['帶著紐約的天際線，走向你的新地平線。', 'Carry the New York skyline toward your new horizon.'],
+  ['感恩，讓平凡的日子發出光芒。', 'Gratitude makes ordinary days shine with light.'],
+  ['你已準備好了，世界也已準備好了你。', 'You are ready, and the world is ready for you.'],
+  ['每一天的努力，都是明天成功的積累。', "Every day's effort is an investment in tomorrow's success."],
+  ['前方的路，比你想象中更加開闊。', 'The road ahead is wider than you can imagine.'],
+  ['無論身在何處，你的價值不變。', 'Wherever you are, your value remains unchanged.'],
+  ['別怕全新的開始，那是最美的冒險。', "Don't fear a fresh start — it's the most beautiful adventure."],
+  ['帶著愛與勇氣，去探索屬於你的天地。', 'With love and courage, explore the world that belongs to you.'],
+  ['放開昨天，才能擁抱今天。', 'Release yesterday to embrace today.'],
+  ['你每一天的成長，都值得被珍惜與記錄。', 'Every day of your growth deserves to be cherished and recorded.'],
+  ['眼前的終點，是下一段旅程的起點。', 'The finish line ahead is the starting line of the next journey.'],
+  ['帶著滿滿的收穫，踏上新的征途。', 'Carry your rich harvest forward onto a new expedition.'],
+  ['人生因勇敢而精彩，因感恩而豐盛。', 'Life is wonderful through courage, and rich through gratitude.'],
+  ['不管未來如何，你已創造了美好的過去。', "Whatever the future holds, you've already created a beautiful past."],
+  ['凡走過，必留下痕跡；凡努力，必有所獲。', 'Every path leaves traces; every effort bears fruit.'],
+  ['時間會讓你明白，這是多麼珍貴的經歷。', 'Time will show you how precious this experience truly was.'],
+  ['你的故事，值得被最用心地書寫。', 'Your story deserves to be written with the utmost care.'],
+  ['成功不是終點，而是另一段旅程的開始。', 'Success is not the destination, but the start of another journey.'],
+  ['帶著從容，應對人生每一個轉彎。', 'Face every turn in life with grace and composure.'],
+  ['你擁有比你知道的更多。', 'You possess more than you know.'],
+  ['選擇快樂，是一種能力，也是一種智慧。', 'Choosing joy is both a skill and a form of wisdom.'],
+  ['讓夢想成為你前進的動力。', 'Let your dreams be the engine that drives you forward.'],
+  ['你的潛力，尚未被完全發掘。', 'Your potential has yet to be fully uncovered.'],
+  ['人生最美的相遇，是遇見更好的自己。', 'The most beautiful encounter in life is meeting a better self.'],
+  ['感謝那些讓你變得更強的風雨。', 'Be thankful for the storms that made you stronger.'],
+  ['帶著笑容前進，世界也會對你微笑。', 'Move forward with a smile, and the world will smile back.'],
+  ['真正的旅行，是從心出發的那一刻。', 'True travel begins the moment you set out from the heart.'],
+  ['你已是一個更好版本的自己。', 'You have already become a better version of yourself.'],
+  ['不論前路多遠，你的努力都有意義。', 'No matter how long the road, your efforts have meaning.'],
+  ['每一個勇敢的決定，都是生命的禮物。', 'Every courageous decision is a gift to your life.'],
+  ['把握當下，感恩每一個呼吸。', 'Seize the present and be grateful for every breath.'],
+  ['你所有的經歷，都在為你的未來鋪路。', 'All your experiences are paving the road to your future.'],
+  ['旅行的意義，在於讓你更了解自己。', 'The meaning of travel is to help you know yourself better.'],
+  ['最勇敢的事，是誠實地面對自己的心。', 'The bravest thing is to honestly face your own heart.'],
+  ['你不是在告別，你是在昇華。', 'You are not saying goodbye; you are ascending.'],
+  ['那些痛過的地方，如今都長出了力量。', 'Where it once hurt, strength has now grown.'],
+  ['帶著你的光，去照亮你下一段旅程。', 'Carry your light to illuminate the next chapter of your journey.'],
+  ['你擁有改變世界的能力，從改變自己開始。', 'You have the power to change the world — start with yourself.'],
+  ['愛你所做，做你所愛，這就是最美的生活。', 'Love what you do, do what you love — that is the most beautiful life.'],
+  ['今天的努力，是明天最美的風景。', "Today's effort is tomorrow's most beautiful scenery."],
+  ['你的心有多大，世界就有多大。', 'The size of your heart determines the size of your world.'],
+  ['在每一個今天，都全力以赴地活著。', 'Give everything you have to every single today.'],
+  ['每一次起飛，都是對生命的深情擁抱。', 'Every takeoff is a heartfelt embrace of life.'],
+  ['你帶走的，比你留下的，更加珍貴。', 'What you take with you is more precious than what you leave behind.'],
+  ['未來的路，由你今天的每一步來決定。', 'The road ahead is shaped by each step you take today.'],
+  ['謝謝紐約，謝謝這段旅程，謝謝更好的自己。', 'Thank you, New York. Thank you for this journey. Thank you, better self.'],
+  ['新的旅程，更好的自己——出發吧！', 'A new journey, a better you — it\'s time to go!'],
+  ['帶著感謝出發，帶著希望抵達。', 'Depart with gratitude. Arrive with hope.'],
+  ['你已成為你需要成為的那個人。', 'You have become the person you needed to be.'],
+  ['倒數結束，精彩才剛開始！', 'The countdown ends — the best is just beginning!'],
+];
+
+// ── Utility: parse 'YYYY-MM-DD' as local date
+function parseLocalDate(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// ── Utility: floor difference in days
+function daysBetween(a, b) {
+  const msPerDay = 86400000;
+  return Math.floor((b - a) / msPerDay);
+}
+
+// ── Phase definitions
+const PHASES = [
+  { label: '100–91', name: '整理與計畫', days: [100,99,98,97,96,95,94,93,92,91] },
+  { label: '90–81',  name: '交接與整理', days: [90,89,88,87,86,85,84,83,82,81] },
+  { label: '80–71',  name: '回顧與感謝', days: [80,79,78,77,76,75,74,73,72,71] },
+  { label: '70–61',  name: '準備與規劃', days: [70,69,68,67,66,65,64,63,62,61] },
+  { label: '60–51',  name: '未來與學習', days: [60,59,58,57,56,55,54,53,52,51] },
+  { label: '50–41',  name: '財務與生活', days: [50,49,48,47,46,45,44,43,42,41] },
+  { label: '40–31',  name: '調整與成長', days: [40,39,38,37,36,35,34,33,32,31] },
+  { label: '30–21',  name: '行動與突破', days: [30,29,28,27,26,25,24,23,22,21] },
+  { label: '20–11',  name: '倒數與專注', days: [20,19,18,17,16,15,14,13,12,11] },
+  { label: '10–1',   name: '迎接新開始', days: [10,9,8,7,6,5,4,3,2,1] },
+];
+
+// ── Main init
+(function init() {
+  const startDate = parseLocalDate(START_DATE);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  startDate.setHours(0,0,0,0);
+
+  const elapsed = daysBetween(startDate, today); // 0 on Day 100
+  const currentDay = 100 - elapsed;              // Day 100 on start, counts down
+
+  // Hero
+  const displayDay = currentDay > 0 ? currentDay : (currentDay === 0 ? '🎉' : '✈️');
+  document.getElementById('days-number').textContent = displayDay;
+
+  // Quote index: Day 100 → index 0, Day 99 → index 1, …, Day 1 → index 99
+  const qIdx = Math.min(Math.max(100 - currentDay, 0), 99);
+  const [zh, en] = QUOTES[qIdx];
+  document.getElementById('quote-zh').textContent = zh;
+  document.getElementById('quote-en').textContent = en;
+
+  // Date string
+  const dateStr = today.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  document.getElementById('hero-date').textContent = dateStr;
+
+  // Background photo — source.unsplash.com with unique sig per day
+  // sig keeps the same photo on the same day; keyword rotates every 10 days
+  const kw = NYC_KEYWORDS[Math.floor(elapsed / 10) % NYC_KEYWORDS.length];
+  const sig = elapsed + 1; // sig 1–100, unique per day
+  document.getElementById('bg-photo').style.backgroundImage =
+    `url(https://source.unsplash.com/1920x1080/?${kw}&sig=${sig})`;
+
+  // Progress bar
+  const passed = Math.max(0, Math.min(100 - currentDay, 99));
+  const pct = Math.round((passed / 99) * 100);
+  document.getElementById('prog-left').textContent = currentDay > 0
+    ? `今天是第 ${currentDay} 天` : '旅程已完成！';
+  document.getElementById('prog-pct').textContent = `${pct}% 已完成`;
+  setTimeout(() => {
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }, 300);
+
+  // Grid
+  buildGrid(currentDay);
+
+  // Footer year
+  document.getElementById('footer-year').textContent = today.getFullYear();
+})();
+
+function buildGrid(currentDay) {
+  const container = document.getElementById('countdown-grid');
+  PHASES.forEach(phase => {
+    const block = document.createElement('div');
+    block.className = 'phase-block';
+
+    const row = document.createElement('div');
+    row.className = 'days-row';
+
+    // Phase label cell
+    const labelCell = document.createElement('div');
+    labelCell.className = 'phase-label';
+    labelCell.innerHTML = `<strong>${phase.label}</strong>${phase.name}`;
+    row.appendChild(labelCell);
+
+    // Day cells
+    phase.days.forEach(day => {
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+
+      if (day > currentDay) {
+        cell.classList.add('passed');
+      } else if (day === currentDay) {
+        cell.classList.add('today');
+        const badge = document.createElement('div');
+        badge.className = 'today-badge';
+        badge.textContent = '今天';
+        cell.appendChild(badge);
+      }
+
+      const num = document.createElement('span');
+      num.textContent = day;
+      cell.appendChild(num);
+      row.appendChild(cell);
+    });
+
+    block.appendChild(row);
+    container.appendChild(block);
+  });
+}
+</script>
+</body>
+</html>
