@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">倒數計時・離開紐約分行</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Serif+TC:wght@300;400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════
+       CSS VARIABLES & RESET
+    ═══════════════════════════════════════ */
+    :root {
+      --navy:          #0a182b;
+      --navy-deep:     #060f1c;
+      --navy-light:    #142b4d;
+      --navy-card:     rgba(20, 43, 77, 0.75);
+      --gold:          #c9a84c;
+      --gold-light:    #e8c97a;
+      --gold-pale:     #f5e9c8;
+      --white:         #fafaf8;
+      --cream:         #f2ead8;
+      --text-dark:     #1a1a2e;
+      --glass:         rgba(10, 24, 43, 0.72);
+      --glass-card:    rgba(14, 33, 62, 0.65);
+      --glass-gold:    rgba(201, 168, 76, 0.18);
+      --border-gold:   rgba(201, 168, 76, 0.32);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Serif TC', serif;
+      background: var(--navy-deep);
+      color: var(--white);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO SECTION & DUAL-LAYER BACKGROUND
+    ═══════════════════════════════════════ */
+    #hero {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 20px 70px;
+      overflow: hidden;
+    }
+
+    /* Dual-layer background for smooth cross-fading */
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: opacity 1.4s ease-in-out, transform 8s ease-out;
+      z-index: 0;
+      opacity: 0;
+      transform: scale(1.03);
+    }
+    .bg-layer.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+    #hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(6, 15, 28, 0.82) 0%,
+        rgba(10, 24, 43, 0.52) 40%,
+        rgba(6, 15, 28, 0.85) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Decorative gold lines */
+    .deco-line {
+      position: absolute;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      height: 1px;
+      width: 65%;
+      opacity: 0.45;
+      z-index: 2;
+    }
+    .deco-line.top { top: 14%; left: 17.5%; }
+    .deco-line.bottom { bottom: 12%; left: 17.5%; }
+
+    /* ═══════════════════════════════════════
+       MODE SWITCHER (TOP BAR)
+    ═══════════════════════════════════════ */
+    .top-control-bar {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 6px 10px;
+      border-radius: 50px;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      max-width: 92vw;
+    }
+
+    .mode-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mode-tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(245, 233, 200, 0.72);
+      font-family: 'Noto Serif TC', serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 8px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .mode-tab-btn:hover {
+      color: var(--white);
+      background: rgba(201, 168, 76, 0.12);
+    }
+
+    .mode-tab-btn.active {
+      background: linear-gradient(135deg, rgba(201, 168, 76, 0.28), rgba(201, 168, 76, 0.15));
+      color: var(--gold-pale);
+      border: 1px solid var(--gold);
+      font-weight: 600;
+      box-shadow: 0 2px 14px rgba(201, 168, 76, 0.25);
+    }
+
+    .mode-icon {
+      font-size: 0.95rem;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO CONTENT
+    ═══════════════════════════════════════ */
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      animation: fadeUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.05rem, 2.3vw, 1.45rem);
+      letter-spacing: 0.28em;
+      color: var(--gold-light);
+      margin-bottom: 12px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      color: var(--gold-pale);
+      background: rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(201, 168, 76, 0.28);
+      margin-bottom: 16px;
+      backdrop-filter: blur(8px);
+      transition: all 0.4s ease;
+    }
+
+    .hero-days-wrapper {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: clamp(10px, 2.5vw, 22px);
+      margin-bottom: 6px;
+    }
+
+    .hero-label-pre, .hero-label-post {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: clamp(1.2rem, 3.2vw, 2.2rem);
+      color: var(--cream);
+      letter-spacing: 0.12em;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .hero-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(5.2rem, 19vw, 11.5rem);
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 6px 45px rgba(201, 168, 76, 0.45), 0 2px 15px rgba(0,0,0,0.8);
+      letter-spacing: -0.02em;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+    }
+    .hero-number.updating {
+      transform: scale(0.92);
+      opacity: 0.7;
+    }
+
+    .hero-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: clamp(1.3rem, 3.6vw, 2.3rem);
+      color: var(--white);
+      letter-spacing: 0.14em;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.7);
+    }
+
+    .hero-divider {
+      width: 90px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 24px;
+    }
+
+    /* ═══════════════════════════════════════
+       QUOTE BLOCK
+    ═══════════════════════════════════════ */
+    .quote-block {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 36px 20px;
+      border: 1px solid var(--border-gold);
+      border-radius: 4px;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      transition: all 0.4s ease;
+    }
+    .quote-block::before, .quote-block::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.75;
+    }
+    .quote-block::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .quote-block::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .quote-zh {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 400;
+      font-size: clamp(1.02rem, 2.2vw, 1.28rem);
+      color: var(--white);
+      line-height: 1.85;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      transition: opacity 0.3s ease;
+    }
+    .quote-en {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(0.92rem, 1.9vw, 1.12rem);
+      color: var(--gold-light);
+      line-height: 1.65;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+      transition: opacity 0.3s ease;
+    }
+
+    .quote-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid rgba(201, 168, 76, 0.12);
+      padding-top: 10px;
+      margin-top: 6px;
+    }
+
+    .quote-shuffle-btn {
+      background: transparent;
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      color: var(--gold-pale);
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-family: 'Noto Serif TC', serif;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.25s ease;
+      opacity: 0.8;
+    }
+    .quote-shuffle-btn:hover {
+      opacity: 1;
+      background: rgba(201, 168, 76, 0.18);
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .hero-date {
+      position: absolute;
+      bottom: 28px;
+      right: 36px;
+      z-index: 4;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.18em;
+      color: rgba(245, 233, 200, 0.7);
+      text-transform: uppercase;
+      background: rgba(10, 24, 43, 0.5);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(201, 168, 76, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.55;
+      animation: bounce 2.4s ease infinite;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .scroll-hint span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+    }
+    .scroll-arrow {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(7px); }
+    }
+
+    /* ═══════════════════════════════════════
+       PHOTO SLIDESHOW CONTROLLER (BOTTOM LEFT)
+    ═══════════════════════════════════════ */
+    .photo-controller {
+      position: absolute;
+      bottom: 24px;
+      left: 36px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 6px 12px;
+      border-radius: 30px;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--gold-pale);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+    .ctrl-btn:hover {
+      background: rgba(201, 168, 76, 0.2);
+      color: var(--white);
+      transform: scale(1.08);
+    }
+    .ctrl-btn:active {
+      transform: scale(0.95);
+    }
+
+    .photo-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      color: var(--gold-light);
+      padding: 0 8px;
+      white-space: nowrap;
+      border-left: 1px solid rgba(201, 168, 76, 0.2);
+      border-right: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    /* ═══════════════════════════════════════
+       PROGRESS BAR SECTION
+    ═══════════════════════════════════════ */
+    .progress-bar-wrap {
+      background: var(--navy-light);
+      padding: 20px 40px;
+      border-top: 1px solid rgba(201, 168, 76, 0.2);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+      position: relative;
+      z-index: 5;
+    }
+    .progress-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      color: var(--gold-pale);
+    }
+    .progress-mode-info {
+      font-size: 0.76rem;
+      opacity: 0.8;
+      color: var(--gold-light);
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light), #fff0be);
+      border-radius: 6px;
+      transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.6);
+    }
+
+    /* ═══════════════════════════════════════
+       FOOTER STORY CARDS
+    ═══════════════════════════════════════ */
+    .footer-band {
+      background: linear-gradient(180deg, var(--navy-light) 0%, var(--navy-deep) 100%);
+      border-top: 1px solid rgba(201, 168, 76, 0.12);
+      padding: 56px 32px;
+      position: relative;
+      z-index: 5;
+    }
+    .footer-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 26px;
+    }
+    .footer-card {
+      padding: 28px 24px;
+      border: 1px solid var(--border-gold);
+      border-radius: 6px;
+      background: var(--glass-card);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .footer-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+    .footer-card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 2px;
+    }
+    .footer-card-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: 0.96rem;
+      letter-spacing: 0.14em;
+      color: var(--gold-light);
+    }
+    .footer-card-text {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: 0.84rem;
+      line-height: 1.8;
+      color: rgba(245, 233, 200, 0.72);
+      letter-spacing: 0.05em;
+    }
+
+    .site-footer {
+      text-align: center;
+      padding: 26px 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: rgba(245, 233, 200, 0.45);
+      letter-spacing: 0.16em;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--navy-deep);
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE DESIGN
+    ═══════════════════════════════════════ */
+    @media (max-width: 860px) {
+      .top-control-bar {
+        top: 16px;
+        padding: 4px 6px;
+      }
+      .mode-tab-btn {
+        padding: 6px 12px;
+        font-size: 0.76rem;
+      }
+      #hero {
+        padding: 100px 16px 80px;
+      }
+      .photo-controller {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 20px;
+      }
+      .hero-date {
+        display: none;
+      }
+      .scroll-hint {
+        display: none;
+      }
+      .progress-bar-wrap {
+        padding: 16px 20px;
+      }
+      .footer-band {
+        padding: 36px 16px;
+      }
+      .quote-block {
+        padding: 20px 22px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════ -->
+<section id="hero">
+  <!-- Dual Background Layers for Seamless Cross-Fade -->
+  <div id="bg-photo-1" class="bg-layer active"></div>
+  <div id="bg-photo-2" class="bg-layer"></div>
+  <div id="hero-overlay"></div>
+
+  <!-- Decorative Gold Lines -->
+  <div class="deco-line top"></div>
+  <div class="deco-line bottom"></div>
+
+  <!-- Top Mode Switcher -->
+  <div class="top-control-bar">
+    <div class="mode-tabs">
+      <button class="mode-tab-btn active" id="tab-enddate" onclick="setCountdownMode('END_DATE')">
+        <span class="mode-icon">🎯</span>
+        <span>目標日倒數 (2026/12/31)</span>
+      </button>
+      <button class="mode-tab-btn" id="tab-original" onclick="setCountdownMode('ORIGINAL_100')">
+        <span class="mode-icon">⏳</span>
+        <span>原版 100 天倒數</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero Main Content -->
+  <div class="hero-content">
+    <p class="hero-eyebrow">感謝過去 · 成長現在 · 迎向未來</p>
+    
+    <div class="mode-badge" id="mode-badge">
+      <span>🎯 目標日期：2026 年 12 月 31 日</span>
+    </div>
+
+    <div class="hero-days-wrapper">
+      <span class="hero-label-pre" id="hero-label-pre">還有</span>
+      <span class="hero-number" id="days-number">—</span>
+      <span class="hero-label-post" id="hero-label-post">天</span>
+    </div>
+
+    <h1 class="hero-title" id="hero-title">離開紐約分行</h1>
+    <div class="hero-divider"></div>
+
+    <div class="quote-block">
+      <p class="quote-zh" id="quote-zh">載入中…</p>
+      <p class="quote-en" id="quote-en"></p>
+      <div class="quote-actions">
+        <button class="quote-shuffle-btn" onclick="shuffleQuote()" title="隨機換一句金句">
+          <span>↻</span> 換一句金句
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Left: Photo Slideshow Controller -->
+  <div class="photo-controller">
+    <button class="ctrl-btn" onclick="prevPhoto()" title="上一張 (鍵盤 ←)">◀</button>
+    <button class="ctrl-btn" id="btn-play-pause" onclick="toggleAutoRotate()" title="播放 / 暫停 (鍵盤 空白鍵)">⏸</button>
+    <button class="ctrl-btn" onclick="nextPhoto()" title="下一張 (鍵盤 →)">▶</button>
+    <button class="ctrl-btn" onclick="randomPhoto()" title="隨機照片">🎲</button>
+    <span class="photo-badge" id="photo-badge">📸 1 / 131</span>
+  </div>
+
+  <!-- Current Date Display -->
+  <div class="hero-date" id="hero-date"></div>
+
+  <!-- Scroll Down Indicator -->
+  <a href="#progress-section" class="scroll-hint">
+    <span>向下探索</span>
+    <div class="scroll-arrow"></div>
+  </a>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PROGRESS BAR SECTION
+════════════════════════════════════════════ -->
+<div class="progress-bar-wrap" id="progress-section">
+  <div class="progress-inner">
+    <div class="progress-meta">
+      <span id="prog-left">進度計算中…</span>
+      <span class="progress-mode-info" id="prog-mode-info"></span>
+      <span id="prog-pct">—% 完成</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER STORY CARDS
+════════════════════════════════════════════ -->
+<div class="footer-band">
+  <div class="footer-inner">
+    <div class="footer-card">
+      <div class="footer-card-icon">⭐</div>
+      <div class="footer-card-title" id="card1-title">目標 2026/12/31</div>
+      <div class="footer-card-text">每一天都是走向新篇章的一步，帶著紐約分行的寶貴經歷，迎接更廣闊的未來。</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">❤️</div>
+      <div class="footer-card-title">感謝與珍惜</div>
+      <div class="footer-card-text">在這段難忘的旅程中，每一份相遇、每一次挑戰，都成為生命中最珍貴的印記。</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">✈️</div>
+      <div class="footer-card-title">新的旅程</div>
+      <div class="footer-card-text">放下過去的包袱，珍惜現在的經驗，勇敢迎向未來，創造屬於自己的精彩人生！</div>
+    </div>
+    <div class="footer-card">
+      <div class="footer-card-icon">🌟</div>
+      <div class="footer-card-title">更好的自己</div>
+      <div class="footer-card-text">未來充滿無限可能，你已準備好了。帶著勇氣與智慧，開創人生下一個精彩章節。</div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  New York · Memories Forever · <span id="footer-year"></span>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ★  倒數機制與系統設定  ★
+   可設定：
+     - DEFAULT_MODE: 'END_DATE' (結束日倒數) 或 'ORIGINAL_100' (原版100天倒數)
+     - END_DATE: '2026/12/31' (指定倒數目標結束日)
+     - START_DATE: '2026-08-30' (原版100天起始日 8/30/2026 / 進度起算基準日)
+     - TOTAL_PHOTOS: 131 (已下載 photo_001.jpg ~ photo_131.jpg 全部輪播)
+     - AUTO_ROTATE: true (是否開啟自動輪播背景)
+     - ROTATE_INTERVAL: 8000 (自動輪播間隔毫秒)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const CONFIG = {
+  DEFAULT_MODE: 'END_DATE',   // 預設模式：'END_DATE' 或 'ORIGINAL_100'
+  END_DATE: '2026/12/31',      // 目標結束日期 (可接受 YYYY/MM/DD 或 YYYY-MM-DD)
+  START_DATE: '2026-08-30',    // 原版100天起始日 (8/30/2026)
+  TOTAL_PHOTOS: 131,           // 照片總數 (photo_001.jpg ~ photo_131.jpg)
+  AUTO_ROTATE: true,           // 是否啟用自動輪播
+  ROTATE_INTERVAL: 8000,       // 輪播間隔（毫秒）
+};
+
+// ── 100 Witty & Humorous Workplace Quotes (中英幽默職場金句 100 句)
+const QUOTES = [
+  ['工作不會讓人變老，但開會絕對可以。', 'Work doesn’t age you, but endless meetings definitely do.'],
+  ['我熱愛我的工作，特別是領薪水和下班的那一刻。', 'I love my job, especially the parts where I get paid and leave.'],
+  ['只要我裝作很忙，新的工作就追不上我。', 'As long as I look busy, new tasks can’t catch up with me.'],
+  ['離職倒數是世界上最有效的天然提神飲料。', 'A countdown to leaving is the most potent energy drink on earth.'],
+  ['這場會議本來可以是一封一分鐘讀完的 Email。', 'This entire meeting could have easily been a one-minute email.'],
+  ['我的辦公室超能力：在老闆走過來的瞬間切換視窗。', 'My office superpower: switching screens the exact millisecond the boss approaches.'],
+  ['每天支撐我上班的動力，除了咖啡，就是下班倒數。', 'The only things fueling my workday are caffeine and the countdown to 5 PM.'],
+  ['薪水就像滿月，一個月出現一次，沒幾天就漸漸消失了。', 'A paycheck is like a full moon — it appears once a month and fades way too fast.'],
+  ['今天能拖到明天的事，就不要今天做了。', 'Never do today what you can comfortably put off until tomorrow.'],
+  ['我不是在摸魚，我是在為公司節省電力和伺服器頻寬。', 'I’m not slacking off; I’m conserving the firm’s electricity and bandwidth.'],
+  ['辦公室裡最動聽的三個字不是我愛你，而是「下班了」。', 'The three sweetest words in the office aren’t "I love you," but "Time to leave."'],
+  ['老闆畫的餅太大了，我的小胃口真的裝不下。', 'The boss is baking dreams far too large for my modest appetite.'],
+  ['世上無難事，只要肯放棄。', 'Nothing is impossible in the office, especially once you decide to give up.'],
+  ['工作就像便秘，用盡全力卻常常只產出一堆修改意見。', 'Work is like constipation: massive effort, disappointing revisions.'],
+  ['週一症候群最好的解藥，就是週五下午。', 'The ultimate scientific cure for Monday blues is Friday afternoon.'],
+  ['我每天都在「好想離職」和「好想網購」之間反覆橫跳。', 'My daily routine: oscillating between "I want to quit" and "I need to shop."'],
+  ['同事問我為什麼總是微笑，因為我在心裡已經下班了。', 'My colleague asked why I smile so much; it’s because mentally I’ve already left.'],
+  ['只要思想不滑坡，辦法總比困難多；但我選擇準時下班。', 'Where there’s a will, there’s a way; but I choose to log off right on time.'],
+  ['人在工位心在野，咖啡喝乾靈魂飛。', 'My body sits in the cubicle, but my soul is already boarding a flight.'],
+  ['開會時點頭並不代表我同意，只代表我還沒睡著。', 'Nodding in a meeting doesn’t mean I agree; it just proves I’m still awake.'],
+  ['世界上最遙遠的距離，是週一早上九點到週五下午五點。', 'The greatest distance in the universe is from Monday 9 AM to Friday 5 PM.'],
+  ['專家說工作能帶來成就感，但放假能帶來純粹的快樂。', 'Experts say work brings achievement, but paid holidays bring pure happiness.'],
+  ['我不怕千軍萬馬，只怕週五下午四點半的突發需求。', 'I fear nothing except an "urgent" task dropped at 4:30 PM on a Friday.'],
+  ['我的鍵盤敲得越響，代表我心裡的白眼翻得越用力。', 'The louder I type, the harder I’m rolling my eyes inside.'],
+  ['人生就像 Excel，一不小心就整行 `#VALUE!` 報錯。', 'Life is like Excel: one accidental keystroke and everything returns #VALUE!.'],
+  ['成年人的崩潰，往往是從找不到剛存的檔案開始的。', 'Adult breakdowns usually begin with "Where on earth did that file just go?"'],
+  ['我上班只帶三樣東西：一副肉體、一杯咖啡、和一顆想回家的心。', 'I bring three things to work: my body, a coffee, and a burning desire to go home.'],
+  ['別跟我談遠大理想，我的理想就是不上班也有錢花。', 'Don’t lecture me on passion; my true passion is being rich without working.'],
+  ['如果事情搞砸了，深呼吸——然後甩鍋給系統延遲。', 'If things go wrong, take a deep breath — and blame it on server latency.'],
+  ['我最大的工作動力，就是看著離職倒數天數一天天減少。', 'My greatest work motivation is watching the exit countdown tick down each day.'],
+  ['問君能有幾多愁？恰似週一開會到白頭。', 'How much sorrow can a human bear? Exactly as much as an endless Monday sync.'],
+  ['只要我不開郵箱，未讀郵件就不算真正存在。', 'If I don’t open my inbox, those urgent emails don’t technically exist yet.'],
+  ['上班是拿時間換金錢，下班是拿金錢換靈魂。', 'Work is trading time for money; clocking out is buying back your soul.'],
+  ['在辦公室生存的第一法則：凡事「好喔收到」，內心「關我啥事」。', 'Office Rule #1: Type "Noted with thanks," think "Why is this my problem?"'],
+  ['我不是遲到，我只是在路上給予世界更多準備好面對我的時間。', 'I’m not late; I was giving the world extra time to prepare for my greatness.'],
+  ['只要你走得夠快並拿著文件夾，大家都以為你在辦大事。', 'If you walk briskly holding a folder, everyone assumes you’re doing vital work.'],
+  ['錢雖然買不來所有快樂，但下班可以直接送達快樂。', 'Money might not buy all happiness, but leaving the office delivers it instantly.'],
+  ['老闆說把公司當成家，於是我決定在辦公室睡個安心午覺。', 'The boss said to treat the office like home, so I took a lovely afternoon nap.'],
+  ['今日運勢：宜摸魚、宜放空、宜準時閃人、忌加班。', 'Today’s horoscope: Great for spacing out and leaving on time, terrible for OT.'],
+  ['工作的最高境界：人在工位坐，靈魂已退休。', 'The pinnacle of corporate zen: Body in the chair, soul already on pension.'],
+  ['早起的鳥兒有蟲吃，但早起的蟲兒被鳥吃。所以我決定睡飽。', 'The early bird gets the worm, but the early worm gets eaten. I choose sleep.'],
+  ['下班不積極，思想大有問題。', 'If you’re not eager to clock out, your life philosophy needs serious fixing.'],
+  ['有些事情看似十萬火急，但放個兩天它自己就解決了。', 'Some urgent crises seem critical, but if left alone for two days, they vanish.'],
+  ['我的打卡紀錄比任何愛情誓言都還要專一長久。', 'My badge punch log is more loyal and devoted than any romantic promise.'],
+  ['上班如上刑，下班如得道成仙。', 'Walking in feels like entering a courtroom; walking out feels like ascension.'],
+  ['與其盲目提高工作效率，不如專注提高下班速度。', 'Instead of endlessly optimizing productivity, focus on optimizing your exit speed.'],
+  ['週一到週四都在渡劫，只有週五下午是在人間。', 'Monday through Thursday is pure survival; Friday afternoon is paradise on earth.'],
+  ['只要倒數數字在減少，今天受的所有委屈都是浮雲。', 'As long as the countdown number drops, today’s petty grievances are mere clouds.'],
+  ['同事：這專案超級急！我：慢工出細活，別急。', 'Colleague: "This project is ultra urgent!" Me: "Great art takes time, breathe."'],
+  ['生活不只有眼前的苟且，還有明天早上的九點晨會。', 'Life isn’t just about immediate struggles; there’s tomorrow’s 9 AM standup.'],
+  ['每天都在精密計算：再熬幾天就可以瀟灑揮手說拜拜。', 'Daily math exercise: Exactly how many days until I can wave a joyful goodbye?'],
+  ['我跟加班的關係，就像水和油，本質上水火不容。', 'My relationship with overtime is like oil and water: fundamentally incompatible.'],
+  ['保持職場健康的黃金法則：多喝水、少說話、準時打卡走人。', 'The golden rule of workplace health: Drink water, stay silent, leave on the dot.'],
+  ['主管談宏觀戰略，我談窗外天氣；主管畫大餅，我吃下午茶。', 'The boss discusses grand macro strategy; I discuss the weather and eat cookies.'],
+  ['工作就像一場馬拉松，而我選擇在補給站安靜喝茶。', 'Work is like a marathon, and I’ve chosen to settle comfortably at the snack tent.'],
+  ['只要我不主動攬事，就沒有責任可以從天而降。', 'If I never volunteer for extra tasks, no blame can ever land on my shoulders.'],
+  ['在紐約學到了什麼？學會了把「去你的」優雅翻譯成「敬請知悉」。', 'What did NYC teach me? How to translate "Get lost" into "Kindly please be advised."'],
+  ['辦公室裡唯一不騙人的，只有這個倒數計時器。', 'The only truly honest thing inside this entire building is this countdown timer.'],
+  ['我的工作效率完全取決於我有多想準時回家。', 'My typing speed is directly proportional to how desperately I want to go home.'],
+  ['紐約很美，但下班打卡後的紐約更加璀璨奪目。', 'New York is pretty, but New York right after clocking out is pure magic.'],
+  ['遇到難題不要慌，先去茶水間泡杯咖啡晃悠兩圈。', 'When problems arise, don’t panic; visit the pantry and brew a fresh cup of coffee.'],
+  ['團隊合作的真正真諦：大家一起分擔，最後找不到任何人負責。', 'True teamwork: Sharing the process so thoroughly that nobody can be blamed.'],
+  ['職場如戲，全靠演技；我今天榮獲「看似超忙」最佳主角獎。', 'Office life is pure theater; today I won Best Actor in "Looking Very Busy."'],
+  ['工作是暫時的，快樂是長久的，下班是神聖不可侵犯的。', 'Jobs are temporary, joy is eternal, clocking out on time is sacred.'],
+  ['千萬別把事情做到100分，做到60分主管就以為你使出洪荒之力了。', 'Never deliver 100%; hitting 60% already makes management think you gave it your all.'],
+  ['在主管走過來前把降噪耳機戴好，是保護耳膜也是保護心靈。', 'Putting on noise-canceling headphones saves both your hearing and your inner peace.'],
+  ['每月入帳的薪水，是我精神受創的法定分期賠償金。', 'My monthly salary is simply legal compensation for recurring emotional distress.'],
+  ['每天清晨睜開眼的第一個願望：希望今天突然宣布放假。', 'My very first wish every single morning: Please let today be a surprise holiday.'],
+  ['離開紐約不是告別，是為了去拯救更廣大的美食世界。', 'Leaving NYC isn’t goodbye; it’s an urgent mission to explore better food.'],
+  ['世界上最動聽的天籟，是下班打卡機發出的清脆一聲。', 'The most beautiful symphony in the world is the beep of the exit badge scanner.'],
+  ['這份工作讓我深刻領悟到，人類的忍耐極限是可以無限擴張的。', 'This job proved beyond doubt that human patience expands to infinite proportions.'],
+  ['開會時講得最大聲的人，通常是真正動手幹活最少的人。', 'The loudest talker in the conference room is almost always doing the least actual work.'],
+  ['我不是在打哈欠，我是在向宇宙無聲傾訴打工人的無奈。', 'I’m not yawning; I’m silently broadcasting worker’s existential angst to the cosmos.'],
+  ['感謝公司多年栽培，讓我練就了一身「面不改色摸大魚」的神技。', 'Thanks to this firm, I achieved the black belt of slacking off with a serious face.'],
+  ['職場成熟的標誌：從「這要怎麼做？」昇華為「這不歸我管」。', 'The hallmark of maturity: Evolving from "How do I do this?" to "Out of scope."'],
+  ['打工雖然累，但摸魚摸得好，天天都是小確幸。', 'Working is exhausting, but slacking off skillfully makes every day a mini holiday.'],
+  ['每天都是全新的一天，意味著又有十幾封奪命催辦郵件在路上。', 'Every morning is a fresh start — bringing ten new "gentle reminder" emails.'],
+  ['我的耐心就像電量不足的藍牙耳機，越靠近五點斷線越快。', 'My patience is like low battery Bluetooth: it completely disconnects near 5 PM.'],
+  ['只要我走得比主管快一步，加班的魔爪就抓不到我。', 'As long as I walk one step faster than my boss, overtime can never catch me.'],
+  ['職場生存指南：遇到困難找制度，沒有制度等下班。', 'Survival guide: If in doubt, cite the policy; if no policy exists, wait for 5 PM.'],
+  ['不要問公司能為你做什麼，問問今晚下班吃哪家好料。', 'Ask not what your company can do for you; ask what delicacy you’re eating tonight.'],
+  ['每天上班的精力配比：20%喝水、30%看錶、50%籌劃下班。', 'My daily energy allocation: 20% hydrating, 30% watch-checking, 50% escape planning.'],
+  ['在倒數的每一秒裡，我都看見未來的自由在向我熱情招手。', 'With every tick of the countdown, I see sweet freedom waving enthusiastically.'],
+  ['薪水只要給到位，我能誇到公司上市；但時間一到，我瞬間蒸發。', 'Pay me well and I’ll praise the firm to heaven; hit 5 PM and I vanish instantly.'],
+  ['別慌，最糟的情況還沒來呢——因為明天依然是個工作日！', 'Don’t panic, the worst hasn’t arrived yet — tomorrow is still a working day!'],
+  ['主管說我有很大成長空間，翻譯過來就是「你剛剛做的全部重做」。', 'The boss said I have "immense growth potential" — which means "redo everything."'],
+  ['咖啡給了我清醒的假象，但下班賦予了我真正的靈魂。', 'Coffee gives the illusion of consciousness, but clocking out restores true life.'],
+  ['在紐約分行的每一天，都在為我鑄造一張刀槍不入的金剛臉皮。', 'Every day in the NYC branch has forged an armor-plated thick skin upon my soul.'],
+  ['職場上最經典的謊言：「我把這個弄完就下班」。', 'The most legendary corporate lie of all time: "I’ll leave right after finishing this."'],
+  ['世界上沒有過不去的坎，除了週一早晨催命的鬧鐘聲。', 'There is no mountain you cannot cross, except Monday morning’s alarm clock.'],
+  ['今天也是在工位上極力演出「正常運作人類」的一天呢！', 'Another successful day of convincingly acting like a functioning human at my desk!'],
+  ['工作雖然繁重，但一想到即將離職奔向自由，嘴角就壓不住了。', 'The workload is heavy, but thinking of incoming freedom makes me grin uncontrollably.'],
+  ['把職場所有壓力化為動力，然後把全部動力拿來準時打卡撤退。', 'Turn all corporate pressure into energy, and direct 100% of it into escaping at 5 PM.'],
+  ['人生苦短何必為難自己，下班時間一到瀟灑離去。', 'Life is too short for endless overtime; when the bell rings, walk away like a boss.'],
+  ['只要心態放得平，天天都是無憂無慮的帶薪退休體驗日。', 'Keep your expectations zero, and every day feels like paid retirement practice.'],
+  ['我走過最長最陡的路，就是管理層畫大餅的千層套路。', 'The longest road I’ve ever traveled is the endless path of managerial promises.'],
+  ['再多的工作也壓不垮我，因為我根本就沒把它往心裡放。', 'No tsunami of tasks can break me, because I never let them reach my heart.'],
+  ['紐約分行珍重再見！我要去擁抱不用設鬧鐘的陽光早晨啦！', 'Farewell NYC branch! Off to embrace sunny mornings without a single alarm clock!'],
+  ['當倒數歸零的那一天，請尊稱我為「無拘無束的自由之神」。', 'When this countdown hits zero, please address me as the Sovereign of Pure Freedom.'],
+  ['倒數結束，江湖再見，感謝紐約，本大爺正式下班畢業啦！', 'Countdown over! So long, thanks for the memories, and I am officially GRADUATED!'],
+];
+
+// ── State Variables
+let currentMode = 'END_DATE'; // 'END_DATE' 或 'ORIGINAL_100'
+let currentPhotoIndex = 1;
+let currentActiveLayer = 1;
+let rotateTimer = null;
+let isAutoRotating = true;
+let currentQuoteIndex = 0;
+
+// ── Utility: Parse Date String ('YYYY/MM/DD', 'YYYY-MM-DD', or 'MM/DD/YYYY')
+function parseDate(str) {
+  const parts = str.replace(/\//g, '-').split('-').map(Number);
+  if (parts[0] > 1000) {
+    // Format: YYYY-MM-DD
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  } else if (parts[2] > 1000) {
+    // Format: MM-DD-YYYY
+    return new Date(parts[2], parts[0] - 1, parts[1]);
+  }
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+// ── Utility: Difference in Days (b - a)
+function daysBetween(a, b) {
+  const msPerDay = 86400000;
+  return Math.round((b - a) / msPerDay);
+}
+
+// ── Utility: Format Photo URL
+function getPhotoUrl(index) {
+  const n = String(index).padStart(3, '0');
+  return `photo_${n}.jpg`;
+}
+
+// ── Photo Loading & Dual-Layer Cross-Fade
+function showPhoto(photoIdx, immediate = false) {
+  currentPhotoIndex = ((photoIdx - 1 + CONFIG.TOTAL_PHOTOS) % CONFIG.TOTAL_PHOTOS) + 1;
+  const url = getPhotoUrl(currentPhotoIndex);
+  
+  const nextLayerNum = currentActiveLayer === 1 ? 2 : 1;
+  const currentLayerEl = document.getElementById(`bg-photo-${currentActiveLayer}`);
+  const nextLayerEl = document.getElementById(`bg-photo-${nextLayerNum}`);
+  
+  const img = new Image();
+  img.onload = () => {
+    nextLayerEl.style.backgroundImage = `url(${url})`;
+    nextLayerEl.classList.add('active');
+    currentLayerEl.classList.remove('active');
+    currentActiveLayer = nextLayerNum;
+    
+    // Update badge
+    document.getElementById('photo-badge').textContent = `📸 ${currentPhotoIndex} / ${CONFIG.TOTAL_PHOTOS}`;
+    
+    // Preload next image
+    const nextIdx = (currentPhotoIndex % CONFIG.TOTAL_PHOTOS) + 1;
+    const preloadImg = new Image();
+    preloadImg.src = getPhotoUrl(nextIdx);
+  };
+  
+  img.onerror = () => {
+    // If specific photo fails, fallback gracefully to gradient
+    currentLayerEl.style.background = 'linear-gradient(160deg, #060f1c 0%, #142b4d 50%, #0a182b 100%)';
+    document.getElementById('photo-badge').textContent = `📸 ${currentPhotoIndex} / ${CONFIG.TOTAL_PHOTOS}`;
+  };
+  
+  img.src = url;
+}
+
+function nextPhoto() {
+  showPhoto(currentPhotoIndex + 1);
+  resetAutoRotateTimer();
+}
+
+function prevPhoto() {
+  showPhoto(currentPhotoIndex - 1);
+  resetAutoRotateTimer();
+}
+
+function randomPhoto() {
+  const rand = Math.floor(Math.random() * CONFIG.TOTAL_PHOTOS) + 1;
+  showPhoto(rand);
+  resetAutoRotateTimer();
+}
+
+// ── Auto-Slideshow Management
+function startAutoRotate() {
+  if (rotateTimer) clearInterval(rotateTimer);
+  rotateTimer = setInterval(() => {
+    showPhoto(currentPhotoIndex + 1);
+  }, CONFIG.ROTATE_INTERVAL);
+  isAutoRotating = true;
+  document.getElementById('btn-play-pause').textContent = '⏸';
+  document.getElementById('btn-play-pause').title = '暫停輪播';
+}
+
+function stopAutoRotate() {
+  if (rotateTimer) clearInterval(rotateTimer);
+  rotateTimer = null;
+  isAutoRotating = false;
+  document.getElementById('btn-play-pause').textContent = '▶';
+  document.getElementById('btn-play-pause').title = '播放輪播';
+}
+
+function toggleAutoRotate() {
+  if (isAutoRotating) {
+    stopAutoRotate();
+  } else {
+    startAutoRotate();
+  }
+}
+
+function resetAutoRotateTimer() {
+  if (isAutoRotating) {
+    startAutoRotate();
+  }
+}
+
+// ── Quote Management
+function displayQuote(index) {
+  currentQuoteIndex = ((index % QUOTES.length) + QUOTES.length) % QUOTES.length;
+  const [zh, en] = QUOTES[currentQuoteIndex];
+  
+  const zhEl = document.getElementById('quote-zh');
+  const enEl = document.getElementById('quote-en');
+  
+  zhEl.style.opacity = '0';
+  enEl.style.opacity = '0';
+  
+  setTimeout(() => {
+    zhEl.textContent = zh;
+    enEl.textContent = en;
+    zhEl.style.opacity = '1';
+    enEl.style.opacity = '1';
+  }, 150);
+}
+
+function shuffleQuote() {
+  let nextIdx;
+  do {
+    nextIdx = Math.floor(Math.random() * QUOTES.length);
+  } while (nextIdx === currentQuoteIndex && QUOTES.length > 1);
+  displayQuote(nextIdx);
+}
+
+// ── Countdown Core Calculation & UI Update
+function updateCountdownUI() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const numEl = document.getElementById('days-number');
+  const labelPreEl = document.getElementById('hero-label-pre');
+  const labelPostEl = document.getElementById('hero-label-post');
+  const titleEl = document.getElementById('hero-title');
+  const badgeEl = document.getElementById('mode-badge');
+  const tabEnddate = document.getElementById('tab-enddate');
+  const tabOriginal = document.getElementById('tab-original');
+  const progLeft = document.getElementById('prog-left');
+  const progModeInfo = document.getElementById('prog-mode-info');
+  const progPct = document.getElementById('prog-pct');
+  const progFill = document.getElementById('progress-fill');
+  const card1Title = document.getElementById('card1-title');
+
+  // Animation pulse
+  numEl.classList.add('updating');
+  setTimeout(() => numEl.classList.remove('updating'), 250);
+
+  if (currentMode === 'END_DATE') {
+    // ══════════════════════════════════════
+    // MODE 1: Target End Date Countdown (2026/12/31)
+    // ══════════════════════════════════════
+    tabEnddate.classList.add('active');
+    tabOriginal.classList.remove('active');
+    
+    const endDate = parseDate(CONFIG.END_DATE);
+    endDate.setHours(0, 0, 0, 0);
+    
+    const remainingDays = daysBetween(today, endDate); // positive if in future
+    
+    // Base start date for progress bar
+    const startDate = parseDate(CONFIG.START_DATE);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const totalSpan = Math.max(1, daysBetween(startDate, endDate));
+    const passedDays = daysBetween(startDate, today);
+    const pct = Math.min(100, Math.max(0, Math.round((passedDays / totalSpan) * 100)));
+
+    badgeEl.innerHTML = `<span>🎯 目標結束日：${CONFIG.END_DATE}</span>`;
+    titleEl.textContent = '離開紐約分行';
+    card1Title.textContent = `目標 ${CONFIG.END_DATE}`;
+    document.title = `倒數 ${remainingDays > 0 ? remainingDays + '天' : ''}・離開紐約分行 (2026/12/31)`;
+
+    if (remainingDays > 0) {
+      labelPreEl.textContent = '還有';
+      numEl.textContent = remainingDays;
+      labelPostEl.textContent = '天';
+      progLeft.textContent = `距離 2026/12/31 還有 ${remainingDays} 天`;
+    } else if (remainingDays === 0) {
+      labelPreEl.textContent = '就是';
+      numEl.textContent = '🎉';
+      labelPostEl.textContent = '今天！';
+      progLeft.textContent = '今天正是目標結束日！新篇章啟程！';
+    } else {
+      labelPreEl.textContent = '已邁入新程';
+      numEl.textContent = '✈️';
+      labelPostEl.textContent = `${Math.abs(remainingDays)} 天`;
+      progLeft.textContent = `已順利啟程 ${Math.abs(remainingDays)} 天`;
+    }
+
+    progModeInfo.textContent = `(歷程起算：${CONFIG.START_DATE})`;
+    progPct.textContent = `${pct}% 已完成`;
+    progFill.style.width = pct + '%';
+
+    // Quote Selection for End Date Mode
+    const quoteIdx = Math.min(Math.max(passedDays % QUOTES.length, 0), QUOTES.length - 1);
+    displayQuote(quoteIdx);
+
+  } else {
+    // ══════════════════════════════════════
+    // MODE 2: Original 100-Day Countdown
+    // ══════════════════════════════════════
+    tabEnddate.classList.remove('active');
+    tabOriginal.classList.add('active');
+
+    const startDate = parseDate(CONFIG.START_DATE);
+    startDate.setHours(0, 0, 0, 0);
+
+    const elapsed = daysBetween(startDate, today);
+    const currentDay = 100 - elapsed;
+
+    badgeEl.innerHTML = `<span>⏳ 經典 100 天倒數模式 (起始日：${CONFIG.START_DATE})</span>`;
+    titleEl.textContent = '離開紐約分行';
+    card1Title.textContent = '倒數100天';
+    document.title = '倒數100天・離開紐約分行';
+
+    if (currentDay > 0) {
+      labelPreEl.textContent = '還有';
+      numEl.textContent = currentDay;
+      labelPostEl.textContent = '天';
+      progLeft.textContent = `今天是第 ${Math.max(1, 100 - currentDay + 1)} 天 (倒數 ${currentDay} 天)`;
+    } else if (currentDay === 0) {
+      labelPreEl.textContent = '就是';
+      numEl.textContent = '🎉';
+      labelPostEl.textContent = '今天！';
+      progLeft.textContent = '100天倒數圓滿完成！';
+    } else {
+      labelPreEl.textContent = '已出發';
+      numEl.textContent = '✈️';
+      labelPostEl.textContent = '旅程啟航';
+      progLeft.textContent = '旅程已圓滿完成！';
+    }
+
+    const passed = Math.max(0, Math.min(100 - currentDay, 100));
+    const pct = Math.round((passed / 100) * 100);
+    progModeInfo.textContent = '(100天倒數模式)';
+    progPct.textContent = `${pct}% 已完成`;
+    progFill.style.width = pct + '%';
+
+    // Quote index for 100-day countdown: Day 100 -> 0, Day 1 -> 99
+    const qIdx = Math.min(Math.max(100 - currentDay, 0), 99);
+    displayQuote(qIdx);
+  }
+}
+
+// ── Switch Mode Function
+function setCountdownMode(mode) {
+  currentMode = mode;
+  try {
+    localStorage.setItem('nyc_countdown_mode', mode);
+  } catch (e) {}
+  updateCountdownUI();
+}
+
+// ── Keyboard Shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') {
+    nextPhoto();
+  } else if (e.key === 'ArrowLeft') {
+    prevPhoto();
+  } else if (e.key === ' ' || e.code === 'Space') {
+    e.preventDefault();
+    toggleAutoRotate();
+  }
+});
+
+// ── Page Initialization
+(function init() {
+  // Check URL params for mode override, or check localStorage, or use CONFIG default
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = urlParams.get('mode');
+  
+  if (modeParam === 'original' || modeParam === '100' || modeParam === 'ORIGINAL_100') {
+    currentMode = 'ORIGINAL_100';
+  } else if (modeParam === 'enddate' || modeParam === '2026' || modeParam === 'END_DATE') {
+    currentMode = 'END_DATE';
+  } else {
+    try {
+      const savedMode = localStorage.getItem('nyc_countdown_mode');
+      if (savedMode === 'ORIGINAL_100' || savedMode === 'END_DATE') {
+        currentMode = savedMode;
+      } else {
+        currentMode = CONFIG.DEFAULT_MODE;
+      }
+    } catch (e) {
+      currentMode = CONFIG.DEFAULT_MODE;
+    }
+  }
+
+  // Set today's date text
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('zh-TW', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  });
+  document.getElementById('hero-date').textContent = dateStr;
+  document.getElementById('footer-year').textContent = today.getFullYear();
+
+  // Pick random starting photo
+  const startPhotoIdx = Math.floor(Math.random() * CONFIG.TOTAL_PHOTOS) + 1;
+  showPhoto(startPhotoIdx, true);
+
+  // Start background auto-slideshow
+  if (CONFIG.AUTO_ROTATE) {
+    startAutoRotate();
+  }
+
+  // Initialize countdown UI
+  updateCountdownUI();
+})();
+</script>
+</body>
+</html>
